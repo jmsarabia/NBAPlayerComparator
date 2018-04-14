@@ -14,7 +14,31 @@
       
 <script type="text/javascript">
 
-  
+//setting up the margins
+var margin = {top: 50, right: 50, bottom: 50, left: 50},
+width = 960 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
+
+//adding svg to page
+var svg = d3.select("body").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var parseYear = d3.timeParse("%Y");
+
+//reading in player data
+d3.csv("seasonstats.csv", function(data) {
+  data.forEach(function(d) {
+    var name = d.Player;
+    var points = +d.PTS;
+    var position = d.Pos;
+    var team = d.Tm;
+    var games = +d.G;
+  });
+ 
+});
 
 
 </script>
