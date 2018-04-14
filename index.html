@@ -26,8 +26,6 @@ var svg = d3.select("body").append("svg")
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var parseYear = d3.timeParse("%Y");
-
 //reading in player data
 d3.csv("seasonstats.csv", function(data) {
   data.forEach(function(d) {
