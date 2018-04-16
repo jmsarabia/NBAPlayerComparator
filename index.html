@@ -28,7 +28,12 @@ function alreadyExists(name) {
 function getBestPlayers() {
   var bestplayers = [];
   for(r = 0 ; r < allplayers.length ; r++) {
-    if(allplayers[r].points >= 15000) {
+    seasons_arr = allplayers[r].seasons;
+    var total_points = 0;
+    for(e = 0 ; e < seasons_arr.length ; e++) {
+      total_points += seasons_arr[e].points;
+    }
+    if(total_points > 15000) {
       bestplayers.push(allplayers[r]);
     }
   }
@@ -62,28 +67,26 @@ d3.csv("seasonstats.csv", function(data) {
 
     if(index == -1) {
 
-      var player = {name: d.Player, points: +d.PTS, assists: +d.AST,
+      var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
         rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
         plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
         age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
         fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC};
+
+      var player = {name: d.Player, seasons: []};
+      player.seasons.push(season);
       
       allplayers.push(player);
 
     } else {
 
-      allplayers[index].points += (+d.PTS);
-      allplayers[index].assists += (+d.AST);
-      allplayers[index].rebounds += (+d.TRB);
-      allplayers[index].steals += (+d.STL);
-      allplayers[index].blocks += (+d.BLK);
-      allplayers[index].plusminus += (+d.BPM);
-      allplayers[index].games += (+d.G);
-      allplayers[index].minutes += (+d.MP);
-      allplayers[index].threepointers += (+d.THREEP);
-      allplayers[index].fieldgoalpercent += (+d.FGPERC);
-      allplayers[index].threepointerpercent += (+d.THREEPPERC);
-      allplayers[index].age = +d.Age;
+      var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
+        rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
+        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
+        age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
+        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC};
+
+      allplayers[index].seasons.push(season);
 
     }
 
@@ -97,7 +100,7 @@ d3.csv("seasonstats.csv", function(data) {
     return x < y ? -1 : x > y ? 1 : 0;
   });
 
-  // debugging(bestplayers);
+  debugging(bestplayers);
   
   svg.append("text")             
     .attr("transform",
