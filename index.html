@@ -14,10 +14,38 @@
       
 <script type="text/javascript">
 
+var allplayers = [];
+
+function alreadyExists(name) {
+  for(t = 0 ; t < allplayers.length ; t++) {
+    if(allplayers[t].name == name) {
+      return t;
+    }
+  }
+  return -1;
+}
+
+function getBestPlayers() {
+  var bestplayers = [];
+  for(r = 0 ; r < allplayers.length ; r++) {
+    if(allplayers[r].points >= 15000) {
+      bestplayers.push(allplayers[r]);
+    }
+  }
+  return bestplayers;
+}
+
+function debugging(bestplayers) {
+  for(q = 0 ; q < bestplayers.length ; q++) {
+    console.log(bestplayers[q].name);
+  }
+  console.log("LENGTH: " + bestplayers.length);
+} 
+
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
 width = 960 - margin.left - margin.right,
-height = 500 - margin.top - margin.bottom;
+height = 700 - margin.top - margin.bottom;
 
 //adding svg to page
 var svg = d3.select("body").append("svg")
@@ -30,12 +58,151 @@ var svg = d3.select("body").append("svg")
 d3.csv("seasonstats.csv", function(data) {
   data.forEach(function(d) {
     var name = d.Player;
-    var points = +d.PTS;
-    var position = d.Pos;
-    var team = d.Tm;
-    var games = +d.G;
+    var index = alreadyExists(name);
+
+    if(index == -1) {
+
+      var player = {name: d.Player, points: +d.PTS, assists: +d.AST,
+        rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
+        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
+        age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
+        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC};
+      
+      allplayers.push(player);
+
+    } else {
+
+      allplayers[index].points += (+d.PTS);
+      allplayers[index].assists += (+d.AST);
+      allplayers[index].rebounds += (+d.TRB);
+      allplayers[index].steals += (+d.STL);
+      allplayers[index].blocks += (+d.BLK);
+      allplayers[index].plusminus += (+d.BPM);
+      allplayers[index].games += (+d.G);
+      allplayers[index].minutes += (+d.MP);
+      allplayers[index].threepointers += (+d.THREEP);
+      allplayers[index].fieldgoalpercent += (+d.FGPERC);
+      allplayers[index].threepointerpercent += (+d.THREEPPERC);
+      allplayers[index].age = +d.Age;
+
+    }
+
   });
- 
+
+  bestplayers = getBestPlayers();
+
+  bestplayers.sort(function(a,b) {
+    var x = a.name.toLowerCase();
+    var y = b.name.toLowerCase();
+    return x < y ? -1 : x > y ? 1 : 0;
+  });
+
+  // debugging(bestplayers);
+  
+  svg.append("text")             
+    .attr("transform",
+          "translate(" + (width/2) + " , -10)")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "24px")
+    .text("Testing Design Element: Player filter");
+
+  var select1 = d3.select('body')
+    .append('select')
+    .attr('class','select')
+    .style('position', 'absolute')
+    .style('top', '200px')
+    .style('left', '20px')
+    .on('change',onchange1)
+
+  var options1 = select1
+    .selectAll('option')
+    .data(bestplayers).enter()
+    .append('option')
+    .text(function (d) { return d.name; });
+
+  var select2 = d3.select('body')
+    .append('select')
+    .attr('class','select2')
+    .style('position', 'absolute')
+    .style('top', '170px')
+    .style('left', '20px')
+    .on('change',onchange2)
+
+  var options2 = select2
+    .selectAll('option')
+    .data(bestplayers).enter()
+    .append('option')
+    .text(function (d) { return d.name; });
+
+  svg.append("rect")
+    .attr("x", -50)
+    .attr("y", 0)
+    .attr("width", 175)
+    .attr("height", 100)
+    .style("fill", "CornflowerBlue ")
+    .style("opacity", 0.8);
+
+  svg.append("rect")
+    .attr("x", -50)
+    .attr("y", 0)
+    .attr("width", 175)
+    .attr("height", 30)
+    .style("fill", "DarkRed")
+    .style("opacity", 0.8);
+
+  svg.append("text")             
+    .attr("transform",
+          "translate(35, 20)")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "17px")
+    .text("Player Filter")
+    .attr("fill", "white");
+
+
+  svg.append("text")             
+    .attr("transform",
+          "translate(" + (width/2) + " , 200)")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "24px")
+    .text("Testing Data: Printing all NBA players with 15,000 points or more");
+
+    svg.selectAll("text")
+      .data(bestplayers)
+      .enter()
+      .append("text")
+      .text(function(d) {
+        return d.name;
+      })
+      .attr("text-anchor", "middle")
+      .attr("x", function(d, i) {
+        return 100 * (i % 9);
+      })
+      .attr("y", function(d, i) {
+        return 20 * (Math.floor(i/9));
+      })
+      .attr("font-family", "sans-serif")
+      .attr("transform",
+          "translate(" + 0 + " , 230)")
+      .attr("font-size", "11px")
+      .attr("fill", "black");
+
+    function onchange1() {
+      selectValue = d3.select('select').property('value')
+      d3.select('body')
+        .append('p')
+        .text(selectValue + ' is the last selected option.')
+    };
+
+    function onchange2() {
+      selectValue = d3.select('select').property('value')
+      d3.select('body')
+        .append('p')
+        .text(selectValue + ' is the last selected option.')
+    };
+
 });
 
 
