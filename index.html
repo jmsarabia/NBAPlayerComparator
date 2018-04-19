@@ -33,11 +33,18 @@ function getBestPlayers() {
     for(e = 0 ; e < seasons_arr.length ; e++) {
       total_points += seasons_arr[e].points;
     }
-    if(total_points > 15000) {
+    if(total_points > 20000) {
       bestplayers.push(allplayers[r]);
     }
   }
   return bestplayers;
+}
+
+function formatName(name) {
+  var string = name.replace(" ", "");
+  string = string.replace("*", "");
+  string += ".png";
+  return string;
 }
 
 function debugging(bestplayers) {
@@ -100,21 +107,14 @@ d3.csv("seasonstats.csv", function(data) {
     return x < y ? -1 : x > y ? 1 : 0;
   });
 
-  debugging(bestplayers);
-  
-  svg.append("text")             
-    .attr("transform",
-          "translate(" + (width/2) + " , -10)")
-    .style("text-anchor", "middle")
-    .style("font-weight", "bold")
-    .style("font-size", "24px")
-    .text("Testing Design Element: Player filter");
+  // debugging(bestplayers);
 
   var select1 = d3.select('body')
     .append('select')
     .attr('class','select')
+    .attr('id', 'one')
     .style('position', 'absolute')
-    .style('top', '200px')
+    .style('top', '150px')
     .style('left', '20px')
     .on('change',onchange1)
 
@@ -126,9 +126,10 @@ d3.csv("seasonstats.csv", function(data) {
 
   var select2 = d3.select('body')
     .append('select')
-    .attr('class','select2')
+    .attr('class','select')
+    .attr('id', 'two')
     .style('position', 'absolute')
-    .style('top', '170px')
+    .style('top', '180px')
     .style('left', '20px')
     .on('change',onchange2)
 
@@ -140,7 +141,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("rect")
     .attr("x", -50)
-    .attr("y", 0)
+    .attr("y", -20)
     .attr("width", 175)
     .attr("height", 100)
     .style("fill", "CornflowerBlue ")
@@ -148,7 +149,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("rect")
     .attr("x", -50)
-    .attr("y", 0)
+    .attr("y", -20)
     .attr("width", 175)
     .attr("height", 30)
     .style("fill", "DarkRed")
@@ -156,54 +157,67 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
     .attr("transform",
-          "translate(35, 20)")
+          "translate(35, 0)")
     .style("text-anchor", "middle")
     .style("font-weight", "bold")
     .style("font-size", "17px")
     .text("Player Filter")
     .attr("fill", "white");
 
+    d3.selectAll("svg")
+      .append("image")
+      .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#one').property('value')))
+      .attr("class", "pico")
+      .attr("id", "pic_one")
+      .attr("height", 240)
+      .attr("width", 400)
+      .attr("x", 100)
+      .attr("y", 30);
 
-  svg.append("text")             
-    .attr("transform",
-          "translate(" + (width/2) + " , 200)")
-    .style("text-anchor", "middle")
-    .style("font-weight", "bold")
-    .style("font-size", "24px")
-    .text("Testing Data: Printing all NBA players with 15,000 points or more");
-
-    svg.selectAll("text")
-      .data(bestplayers)
-      .enter()
-      .append("text")
-      .text(function(d) {
-        return d.name;
-      })
-      .attr("text-anchor", "middle")
-      .attr("x", function(d, i) {
-        return 100 * (i % 9);
-      })
-      .attr("y", function(d, i) {
-        return 20 * (Math.floor(i/9));
-      })
-      .attr("font-family", "sans-serif")
+    svg.append("text")             
       .attr("transform",
-          "translate(" + 0 + " , 230)")
-      .attr("font-size", "11px")
+          "translate(250, 240)")
+      .attr("id", "text_one")
+      .style("text-anchor", "middle")
+      .style("font-weight", "bold")
+      .style("font-size", "14px")
+      .text(function() {
+        return d3.select('select#one').property('value').replace("*", "");
+      })
+      .attr("fill", "black");
+
+    d3.selectAll("svg")
+      .append("image")
+      .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#two').property('value')))
+      .attr("class", "pico")
+      .attr("id", "pic_two")
+      .attr("height", 240)
+      .attr("width", 400)
+      .attr("x", 340)
+      .attr("y", 30);
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(480, 240)")
+      .attr("id", "text_two")
+      .style("text-anchor", "middle")
+      .style("font-weight", "bold")
+      .style("font-size", "14px")
+      .text(function() {
+        return d3.select('select#two').property('value').replace("*", "");
+      })
       .attr("fill", "black");
 
     function onchange1() {
-      selectValue = d3.select('select').property('value')
-      d3.select('body')
-        .append('p')
-        .text(selectValue + ' is the last selected option.')
+      selectValue = d3.select('select#one').property('value');
+      d3.select('image#pic_one').attr("xlink:href", "playerpictures/" + formatName(selectValue));
+      d3.select('text#text_one').text(selectValue.replace("*", ""));
     };
 
     function onchange2() {
-      selectValue = d3.select('select').property('value')
-      d3.select('body')
-        .append('p')
-        .text(selectValue + ' is the last selected option.')
+     selectValue = d3.select('select#two').property('value')
+     d3.select('image#pic_two').attr("xlink:href", "playerpictures/" + formatName(selectValue));
+     d3.select('text#text_two').text(selectValue.replace("*", ""));
     };
 
 });
