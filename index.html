@@ -42,7 +42,6 @@ function getBestPlayers() {
 
 function formatName(name) {
   var string = name.replace(" ", "");
-  string = string.replace("*", "");
   string += ".png";
   return string;
 }
@@ -52,7 +51,15 @@ function debugging(bestplayers) {
     console.log(bestplayers[q].name);
   }
   console.log("LENGTH: " + bestplayers.length);
-} 
+}
+
+function getIndex(player, bestplayers) {
+  for(g = 0 ; g < bestplayers.length ; g++) {
+    if(bestplayers[g].name.replace("*", "") == player) {
+      return g;
+    }
+  }
+}
 
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
@@ -114,7 +121,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'one')
     .style('position', 'absolute')
-    .style('top', '150px')
+    .style('top', '120px')
     .style('left', '20px')
     .on('change',onchange1)
 
@@ -122,26 +129,34 @@ d3.csv("seasonstats.csv", function(data) {
     .selectAll('option')
     .data(bestplayers).enter()
     .append('option')
-    .text(function (d) { return d.name; });
+    .text(function (d, i) { return d.name.replace("*", ""); })
 
   var select2 = d3.select('body')
     .append('select')
     .attr('class','select')
     .attr('id', 'two')
     .style('position', 'absolute')
-    .style('top', '180px')
+    .style('top', '150px')
     .style('left', '20px')
-    .on('change',onchange2)
+    .on('change',onchange2);
 
   var options2 = select2
     .selectAll('option')
     .data(bestplayers).enter()
     .append('option')
-    .text(function (d) { return d.name; });
+    .text(function (d) { return d.name.replace("*", ""); })
+
+  var selection1 = document.getElementById('one');
+  var index1 = getIndex("LeBron James", bestplayers);
+  selection1.selectedIndex = index1;
+
+  var selection2 = document.getElementById('two');
+  var index2 = getIndex("Michael Jordan", bestplayers);
+  selection2.selectedIndex = index2;
 
   svg.append("rect")
     .attr("x", -50)
-    .attr("y", -20)
+    .attr("y", -50)
     .attr("width", 175)
     .attr("height", 100)
     .style("fill", "CornflowerBlue ")
@@ -149,7 +164,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("rect")
     .attr("x", -50)
-    .attr("y", -20)
+    .attr("y", -50)
     .attr("width", 175)
     .attr("height", 30)
     .style("fill", "DarkRed")
@@ -157,68 +172,523 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
     .attr("transform",
-          "translate(35, 0)")
+          "translate(35, -30)")
     .style("text-anchor", "middle")
     .style("font-weight", "bold")
     .style("font-size", "17px")
     .text("Player Filter")
     .attr("fill", "white");
 
-    d3.selectAll("svg")
-      .append("image")
-      .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#one').property('value')))
-      .attr("class", "pico")
-      .attr("id", "pic_one")
-      .attr("height", 240)
-      .attr("width", 400)
-      .attr("x", 100)
-      .attr("y", 30);
+  svg.append("text")             
+    .attr("transform",
+          "translate(300, 270)")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "20px")
+    .text("Average Stats for Each Season")
+    .attr("fill", "black");
 
-    svg.append("text")             
+  d3.selectAll("svg")
+    .append("image")
+    .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#one').property('value')))
+    .attr("class", "pico")
+    .attr("id", "pic_one")
+    .attr("height", 240)
+    .attr("width", 400)
+    .attr("x", 100)
+    .attr("y", 0);
+
+  svg.append("text")             
+    .attr("transform",
+        "translate(250, 210)")
+    .attr("id", "text_one")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "14px")
+    .text(function() {
+      return d3.select('select#one').property('value');
+    })
+    .attr("fill", "black");
+
+  d3.selectAll("svg")
+    .append("image")
+    .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#two').property('value')))
+    .attr("class", "pico")
+    .attr("id", "pic_two")
+    .attr("height", 240)
+    .attr("width", 400)
+    .attr("x", 340)
+    .attr("y", 0);
+
+  svg.append("text")             
+    .attr("transform",
+        "translate(480, 210)")
+    .attr("id", "text_two")
+    .style("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .style("font-size", "14px")
+    .text(function() {
+      return d3.select('select#two').property('value');
+    })
+    .attr("fill", "black");
+
+  var index3 = getIndex(d3.select('select#one').property('value'), bestplayers);
+  var index4 = getIndex(d3.select('select#two').property('value'), bestplayers);
+
+  function getMax(which, seasonArr1, seasonArr2) {
+    var max = 0;
+    for(q = 0 ; q < seasonArr1.length ; q++) {
+      var games = seasonArr1[q].games;
+      if(which == 0) {
+        var ppg = seasonArr1[q].points/games;
+        if(ppg > max) {
+          max = ppg;
+        }
+      }
+      if(which == 1) {
+        var apg = seasonArr1[q].assists/games;
+        if(apg > max) {
+          max = apg;
+        }
+      }
+      if(which == 2) {
+        var rpg = seasonArr1[q].rebounds/games;
+        if(rpg > max) {
+          max = rpg;
+        }
+      }
+      if(which == 3) {
+        var bpg = seasonArr1[q].blocks/games;
+        if(bpg > max) {
+          max = bpg;
+        }
+      }
+      if(which == 4) {
+        var spg = seasonArr1[q].steals/games;
+        if(spg > max) {
+          max = spg;
+        }
+      }
+      if(which == 5) {
+        var plusminus = seasonArr1[q].plusminus;
+        if(plusminus > max) {
+          max = plusminus;
+        }
+      }
+    }
+    for(e = 0 ; e < seasonArr2.length ; e++) {
+      var games = seasonArr2[e].games;
+      if(which == 0) {
+        var ppg = seasonArr2[e].points/games;
+        if(ppg > max) {
+          max = ppg;
+        }
+      }
+      if(which == 1) {
+        var apg = seasonArr2[e].assists/games;
+        if(apg > max) {
+          max = apg;
+        }
+      }
+      if(which == 2) {
+        var rpg = seasonArr2[e].rebounds/games;
+        if(rpg > max) {
+          max = rpg;
+        }
+      }
+      if(which == 3) {
+        var bpg = seasonArr2[e].blocks/games;
+        if(bpg > max) {
+          max = bpg;
+        }
+      }
+      if(which == 4) {
+        var spg = seasonArr2[e].steals/games;
+        if(spg > max) {
+          max = spg;
+        }
+      }
+      if(which == 5) {
+        var plusminus = seasonArr2[e].plusminus;
+        if(plusminus > max) {
+          max = plusminus;
+        }
+      }
+    }
+    return max;
+  }
+
+  var maxPPG = getMax(0, bestplayers[index3].seasons, bestplayers[index4].seasons);
+  var maxAPG = getMax(1, bestplayers[index3].seasons, bestplayers[index4].seasons);
+  var maxRPG = getMax(2, bestplayers[index3].seasons, bestplayers[index4].seasons);
+  var maxBPG = getMax(3, bestplayers[index3].seasons, bestplayers[index4].seasons);
+  var maxSPG = getMax(4, bestplayers[index3].seasons, bestplayers[index4].seasons);
+  var maxPL = getMax(5, bestplayers[index3].seasons, bestplayers[index4].seasons);
+
+  function getPPGScale(maxPPG) {
+    var ppgScale = d3.scaleLinear().domain([0,maxPPG + 6]).range([570,300]);
+    return ppgScale;
+  }
+
+  function getAPGScale(maxAPG) {
+    var apgScale = d3.scaleLinear().domain([0,maxAPG + 6]).range([570,300]);
+    return apgScale;
+  }
+
+  function getRPGScale(maxRPG) {
+    var rpgScale = d3.scaleLinear().domain([0,maxRPG + 6]).range([570,300]);
+    return rpgScale;
+  }
+
+  function getBPGScale(maxBPG) {
+    var bpgScale = d3.scaleLinear().domain([0,maxBPG + 6]).range([570,300]);
+    return bpgScale;
+  }
+
+  function getSPGScale(maxSPG) {
+    var spgScale = d3.scaleLinear().domain([0,maxSPG + 6]).range([570,300]);
+    return spgScale;
+  }
+
+  function getPlusMinusScale(maxPL) {
+    var plusminusScale = d3.scaleLinear().domain([-5,maxPL]).range([570,300]);
+    return plusminusScale;
+  }
+
+  ppgScale = getPPGScale(maxPPG);
+  apgScale = getAPGScale(maxAPG);
+  rpgScale = getRPGScale(maxRPG);
+  bpgScale = getBPGScale(maxBPG);
+  spgScale = getSPGScale(maxSPG)
+  plusminusScale = getPlusMinusScale(maxPL);
+
+  var labels = ['PPG', 'APG', 'RPG', 'BPG', 'SPG', '+/-'];
+
+  var xScale1 = d3.scaleOrdinal()
+    .domain(labels)
+    .range([0, 120, 240, 360, 480, 600]);
+
+  var opacityScale = d3.scaleLinear()
+    .domain([0, 20])
+    .range([0, 1]);
+
+  svg.append("g")
+      .attr("id", "yone")
+      .attr("class", "y axis")
+      .call(d3.axisLeft(getPPGScale(maxPPG)));
+
+  svg.append("g")
+      .attr("id", "ytwo")
+      .attr("class", "y axis")
+      .attr("transform", "translate(120, 0)")
+      .call(d3.axisLeft(getAPGScale(maxAPG)));
+
+  svg.append("g")
+      .attr("id", "ythree")
+      .attr("class", "y axis")
+      .attr("transform", "translate(240, 0)")
+      .call(d3.axisLeft(getRPGScale(maxRPG)));
+
+  svg.append("g")
+      .attr("id", "yfour")
+      .attr("class", "y axis")
+      .attr("transform", "translate(360, 0)")
+      .call(d3.axisLeft(getBPGScale(maxBPG)));
+
+  svg.append("g")
+      .attr("id", "yfive")
+      .attr("class", "y axis")
+      .attr("transform", "translate(480, 0)")
+      .call(d3.axisLeft(getSPGScale(maxPPG)));   
+
+  svg.append("g")
+      .attr("id", "ysix")
+      .attr("class", "y axis")
+      .attr("transform", "translate(600, 0)")
+      .call(d3.axisLeft(getPlusMinusScale(maxPL)));
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0, 585)")
+      .call(d3.axisBottom(xScale1));
+
+  var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale];
+
+  drawLines(index3, "blue", "one", scales);
+  drawLines(index4, "red", "two", scales);
+  drawLegend(d3.select('select#one').property('value'), d3.select('select#two').property('value'));
+
+  function drawLines(index, color, numb, scales) {
+    for(var r = 0 ; r < bestplayers[index].seasons.length ; r++) {
+      var games = bestplayers[index].seasons[r].games;
+      var ppg = bestplayers[index].seasons[r].points/games;
+      var apg = bestplayers[index].seasons[r].assists/games;
+      var rpg = bestplayers[index].seasons[r].rebounds/games;
+      var bpg = bestplayers[index].seasons[r].blocks/games;
+      var spg = bestplayers[index].seasons[r].steals/games;
+      var plusminus = bestplayers[index].seasons[r].plusminus;
+
+      drawLine(0, 120, color, r, ppg, apg, numb, scales);
+      drawLine(120, 240, color, r, apg, rpg, numb, scales);
+      drawLine(240, 360, color, r, rpg, bpg, numb, scales);
+      drawLine(360, 480, color, r, bpg, spg, numb, scales);
+      drawLine(480, 600, color, r, spg, plusminus, numb, scales);
+    }
+  }
+
+  function drawLine(start, end, color, r, stat1, stat2, numb, scales) {
+    var attrID = "line" + start + "_" + r.toString() + numb;
+    ppgScale = scales[0];
+    apgScale = scales[1];
+    rpgScale = scales[2];
+    bpgScale = scales[3];
+    spgScale = scales[4];
+    plusminusScale = scales[5];
+    if(start == 0) {
+      var y1 = ppgScale(stat1);
+      var y2 = apgScale(stat2);
+    }
+    if(start == 120) {
+      var y1 = apgScale(stat1);
+      var y2 = rpgScale(stat2);
+    }
+    if(start == 240) {
+      var y1 = rpgScale(stat1);
+      var y2 = bpgScale(stat2);
+    } 
+    if(start == 360) {
+      var y1 = bpgScale(stat1);
+      var y2 = spgScale(stat2);
+    }
+    if(start == 480) {
+      var y1 = spgScale(stat1);
+      var y2 = plusminusScale(stat2);
+    }   
+
+    svg.append("line")
+      .attr("id", attrID)
+      .attr("x1", start)
+      .attr("y1", y1)
+      .attr("x2", end)
+      .attr("y2", y2)
+      .attr("stroke-width", 1)
+      .attr("stroke", color)
+      .attr("opacity", function(d) { return opacityScale(r); });
+  }
+
+  function drawLegend(player1, player2) {
+    svg.append("line")
+      .attr("x1", -40)
+      .attr("y1", 180)
+      .attr("x2", -40)
+      .attr("y2", 260)
+      .attr("stroke-width", 3)
+      .attr("stroke", "black");
+    svg.append("line")
+      .attr("x1", 125)
+      .attr("y1", 180)
+      .attr("x2", 125)
+      .attr("y2", 260)
+      .attr("stroke-width", 3)
+      .attr("stroke", "black");
+    svg.append("line")
+      .attr("x1", -40)
+      .attr("y1", 181)
+      .attr("x2", 125)
+      .attr("y2", 181)
+      .attr("stroke-width", 3)
+      .attr("stroke", "black");
+
+    svg.append("line")
+      .attr("x1", -40)
+      .attr("y1", 259)
+      .attr("x2", 125)
+      .attr("y2", 259)
+      .attr("stroke-width", 3)
+      .attr("stroke", "black");
+
+    svg.append("line")
+      .attr("x1", -40)
+      .attr("y1", 259)
+      .attr("x2", 125)
+      .attr("y2", 259)
+      .attr("stroke-width", 3)
+      .attr("stroke", "black");
+
+    svg.append("line")
+      .attr("x1", -30)
+      .attr("y1", 207)
+      .attr("x2", -4)
+      .attr("y2", 207)
+      .attr("stroke-width", 5)
+      .attr("stroke", "blue");
+
+    svg.append("line")
+      .attr("x1", -30)
+      .attr("y1", 235)
+      .attr("x2", -4)
+      .attr("y2", 235)
+      .attr("stroke-width", 5)
+      .attr("stroke", "red");
+
+    svg.append("text")   
+      .attr("id", "legendone")          
       .attr("transform",
-          "translate(250, 240)")
-      .attr("id", "text_one")
+          "translate(55, 210)")
       .style("text-anchor", "middle")
-      .style("font-weight", "bold")
-      .style("font-size", "14px")
-      .text(function() {
-        return d3.select('select#one').property('value').replace("*", "");
-      })
+      .style("font-size", "13px")
+      .text(player1)
       .attr("fill", "black");
 
-    d3.selectAll("svg")
-      .append("image")
-      .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#two').property('value')))
-      .attr("class", "pico")
-      .attr("id", "pic_two")
-      .attr("height", 240)
-      .attr("width", 400)
-      .attr("x", 340)
-      .attr("y", 30);
-
-    svg.append("text")             
+    svg.append("text")  
+      .attr("id", "legendtwo")          
       .attr("transform",
-          "translate(480, 240)")
-      .attr("id", "text_two")
+          "translate(55, 238)")
       .style("text-anchor", "middle")
-      .style("font-weight", "bold")
-      .style("font-size", "14px")
-      .text(function() {
-        return d3.select('select#two').property('value').replace("*", "");
-      })
+      .style("font-size", "13px")
+      .text(player2)
       .attr("fill", "black");
 
-    function onchange1() {
-      selectValue = d3.select('select#one').property('value');
-      d3.select('image#pic_one').attr("xlink:href", "playerpictures/" + formatName(selectValue));
-      d3.select('text#text_one').text(selectValue.replace("*", ""));
-    };
+    svg.append("text")            
+      .attr("transform",
+          "translate(40, 170)")
+      .style("text-anchor", "middle")
+      .style("font-weight", "bold")
+      .style("font-size", "18px")
+      .text("Legend")
+      .attr("fill", "black");
+  }
 
-    function onchange2() {
-     selectValue = d3.select('select#two').property('value')
-     d3.select('image#pic_two').attr("xlink:href", "playerpictures/" + formatName(selectValue));
-     d3.select('text#text_two').text(selectValue.replace("*", ""));
-    };
+  function onchange1() {
+    selectValue = d3.select('select#one').property('value');
+    selectValueOther = d3.select('select#two').property('value');
+    d3.select('image#pic_one').attr("xlink:href", "playerpictures/" + formatName(selectValue));
+    d3.select('text#text_one').text(selectValue);
+    d3.select('text#legendone').text(selectValue);
+    for(a = 0 ; a < 600 ; a++) {
+      for(r = 0 ; r < 20 ; r++) {
+        d3.select('#line' + a + "_" + r + "one").remove();
+      }
+    }
+    for(a = 0 ; a < 600 ; a++) {
+      for(r = 0 ; r < 20 ; r++) {
+        d3.select('#line' + a + "_" + r + "two").remove();
+      }
+    }
+    d3.select('#yone').remove();
+    d3.select('#ytwo').remove();
+    d3.select('#ythree').remove();
+    d3.select('#yfour').remove();
+    d3.select('#yfive').remove();
+    d3.select('#ysix').remove();
+    
+    var index1 = getIndex(selectValue, bestplayers);
+    var index2 = getIndex(selectValueOther, bestplayers);
+    var maxPPG = getMax(0, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxAPG = getMax(1, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxRPG = getMax(2, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxBPG = getMax(3, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxSPG = getMax(4, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxPL = getMax(5, bestplayers[index1].seasons, bestplayers[index2].seasons);
+
+    ppgScale = getPPGScale(maxPPG);
+    apgScale = getAPGScale(maxAPG);
+    rpgScale = getRPGScale(maxRPG);
+    bpgScale = getBPGScale(maxBPG);
+    spgScale = getSPGScale(maxSPG)
+    plusminusScale = getPlusMinusScale(maxPL);
+
+    var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale];
+
+    drawAxes(scales);
+
+    drawLines(index1, "blue", "one", scales);
+    drawLines(index2, "red", "two", scales);
+  };
+
+  function onchange2() {
+    selectValue = d3.select('select#two').property('value')
+    selectValueOther = d3.select('select#one').property('value');
+    d3.select('image#pic_two').attr("xlink:href", "playerpictures/" + formatName(selectValue));
+    d3.select('text#text_two').text(selectValue);
+    d3.select('text#legendtwo').text(selectValue);
+    for(a = 0 ; a < 600 ; a++) {
+      for(r = 0 ; r < 20 ; r++) {
+        d3.select('#line' + a + "_" + r + "one").remove();
+      }
+    }
+    for(a = 0 ; a < 600 ; a++) {
+      for(r = 0 ; r < 20 ; r++) {
+        d3.select('#line' + a + "_" + r + "two").remove();
+      }
+    }
+    d3.select('#yone').remove();
+    d3.select('#ytwo').remove();
+    d3.select('#ythree').remove();
+    d3.select('#yfour').remove();
+    d3.select('#yfive').remove();
+    d3.select('#ysix').remove();
+
+    var index1 = getIndex(selectValue, bestplayers);
+    var index2 = getIndex(selectValueOther, bestplayers);
+    var maxPPG = getMax(0, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxAPG = getMax(1, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxRPG = getMax(2, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxBPG = getMax(3, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxSPG = getMax(4, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var maxPL = getMax(5, bestplayers[index1].seasons, bestplayers[index2].seasons);
+
+    ppgScale = getPPGScale(maxPPG);
+    apgScale = getAPGScale(maxAPG);
+    rpgScale = getRPGScale(maxRPG);
+    bpgScale = getBPGScale(maxBPG);
+    spgScale = getSPGScale(maxSPG)
+    plusminusScale = getPlusMinusScale(maxPL);
+
+    var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale];
+
+    drawAxes(scales);
+
+    drawLines(index1, "red", "two", scales);
+    drawLines(index2, "blue", "one", scales);
+  };
+
+  function drawAxes(scales) {
+    svg.append("g")
+      .attr("id", "yone")
+      .attr("class", "y axis")
+      .call(d3.axisLeft(scales[0]));
+
+    svg.append("g")
+      .attr("id", "ytwo")
+      .attr("class", "y axis")
+      .attr("transform", "translate(120, 0)")
+      .call(d3.axisLeft(scales[1]));
+
+    svg.append("g")
+      .attr("id", "ythree")
+      .attr("class", "y axis")
+      .attr("transform", "translate(240, 0)")
+      .call(d3.axisLeft(scales[2]));
+
+    svg.append("g")
+      .attr("id", "yfour")
+      .attr("class", "y axis")
+      .attr("transform", "translate(360, 0)")
+      .call(d3.axisLeft(scales[3]));
+
+    svg.append("g")
+      .attr("id", "yfive")
+      .attr("class", "y axis")
+      .attr("transform", "translate(480, 0)")
+      .call(d3.axisLeft(scales[4]));   
+
+    svg.append("g")
+      .attr("id", "ysix")
+      .attr("class", "y axis")
+      .attr("transform", "translate(600, 0)")
+      .call(d3.axisLeft(scales[5]));
+  }
 
 });
 
