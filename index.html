@@ -7,8 +7,7 @@
     </style>
   </head>
 <body>
-  
-<h1>NBA Player Comparator</h1>
+<img src="logo.png" alt="logo" width="500" height="150">
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
       
@@ -224,7 +223,7 @@ d3.csv("seasonstats.csv", function(data) {
     return x < y ? -1 : x > y ? 1 : 0;
 });
 
-  debugging1(bestplayers);
+  // debugging1(bestplayers);
   // debugging2();
 
   var select1 = d3.select('body')
@@ -232,7 +231,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'one')
     .style('position', 'absolute')
-    .style('top', '120px')
+    .style('top', '205px')
     .style('left', '20px')
     .on('change',onchange1)
 
@@ -247,7 +246,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'two')
     .style('position', 'absolute')
-    .style('top', '150px')
+    .style('top', '235px')
     .style('left', '20px')
     .on('change',onchange2);
 
@@ -269,34 +268,35 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("x", -50)
     .attr("y", -50)
     .attr("width", 175)
-    .attr("height", 100)
-    .style("fill", "CornflowerBlue ")
-    .style("opacity", 0.8);
+    .attr("height", 100)       // set the x corner curve radius
+    .attr("ry", 10)
+    .style("fill", "CornflowerBlue");
 
-  svg.append("rect")
-    .attr("x", -50)
-    .attr("y", -50)
-    .attr("width", 175)
-    .attr("height", 30)
-    .style("fill", "DarkRed")
-    .style("opacity", 0.8);
+  // svg.append("rect")
+  //   .attr("x", -50)
+  //   .attr("y", -50)
+  //   .attr("width", 175)
+  //   .attr("height", 30)       // set the x corner curve radius
+  //   .attr("ry", 10)  
+  //   .style("fill", "DarkGrey")
+  //   .style("opacity", 1);
 
   svg.append("text")             
     .attr("transform",
-          "translate(35, -30)")
+          "translate(35, -22)")
     .style("text-anchor", "middle")
-    .style("font-weight", "bold")
-    .style("font-size", "17px")
+    .style("font-size", "19px")
     .text("Player Filter")
+    .style("font-family", "Helvetica, Arial, Sans-Serif")
     .attr("fill", "white");
 
   svg.append("text")             
     .attr("transform",
           "translate(300, 270)")
     .style("text-anchor", "middle")
-    .style("font-weight", "bold")
     .style("font-size", "20px")
     .text("Average Stats for Each Season")
+    .style("font-family", "Helvetica, Arial, Sans-Serif")
     .attr("fill", "black");
 
   d3.selectAll("svg")
@@ -314,7 +314,7 @@ d3.csv("seasonstats.csv", function(data) {
         "translate(250, 210)")
     .attr("id", "text_one")
     .style("text-anchor", "middle")
-    .style("font-weight", "bold")
+    .style("font-family", "Helvetica, Arial, Sans-Serif")
     .style("font-size", "14px")
     .text(function() {
       return d3.select('select#one').property('value');
@@ -336,7 +336,7 @@ d3.csv("seasonstats.csv", function(data) {
         "translate(480, 210)")
     .attr("id", "text_two")
     .style("text-anchor", "middle")
-    .style("font-weight", "bold")
+    .style("font-family", "Helvetica, Arial, Sans-Serif")
     .style("font-size", "14px")
     .text(function() {
       return d3.select('select#two').property('value');
@@ -517,7 +517,7 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("transform",
           "translate(300, 680)")
       .style("text-anchor", "middle")
-      .style("font-weight", "bold")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "20px")
       .text("Playoff Results for Each Season")
       .attr("fill", "black");
@@ -798,6 +798,7 @@ d3.csv("seasonstats.csv", function(data) {
       .style("font-size", "13px")
       .text(player1)
       .attr("fill", "black")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
       .on("mouseover", function() {
         for(a = 0 ; a < 600 ; a++) {
           for(r = 0 ; r < 20 ; r++) {
@@ -808,7 +809,7 @@ d3.csv("seasonstats.csv", function(data) {
       .on("mouseout", function() {
         for(a = 0 ; a < 600 ; a++) {
           for(r = 0 ; r < 20 ; r++) {
-            d3.select('#line' + a + "_" + r + "two").style("opacity", 1);
+            d3.select('#line' + a + "_" + r + "two").style("opacity", function(d) { return opacityScale(r); });
           }
         }
       });
@@ -821,6 +822,7 @@ d3.csv("seasonstats.csv", function(data) {
       .style("font-size", "13px")
       .text(player2)
       .attr("fill", "black")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
       .on("mouseover", function() {
         for(a = 0 ; a < 600 ; a++) {
           for(r = 0 ; r < 20 ; r++) {
@@ -831,7 +833,7 @@ d3.csv("seasonstats.csv", function(data) {
       .on("mouseout", function() {
         for(a = 0 ; a < 600 ; a++) {
           for(r = 0 ; r < 20 ; r++) {
-            d3.select('#line' + a + "_" + r + "one").style("opacity", 1);
+            d3.select('#line' + a + "_" + r + "one").style("opacity", function(d) { return opacityScale(r); });
           }
         }
       });
@@ -840,9 +842,9 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("transform",
           "translate(40, 170)")
       .style("text-anchor", "middle")
-      .style("font-weight", "bold")
       .style("font-size", "18px")
       .text("Legend")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
       .attr("fill", "black");
   }
 
