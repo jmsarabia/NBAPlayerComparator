@@ -15,6 +15,30 @@
 <script type="text/javascript">
 
 var allplayers = [];
+var playoffsArr = [];
+
+var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers", 
+"LAL": "Los Angeles Lakers", "UTA": "Utah Jazz", "DET": "Detroit Pistons",
+"DAL": "Dallas Mavericks", "MIL": "Milwaukee Bucks", "DEV": "Denver Nuggets",
+"PHI": "Philadelphia 76ers", "MEM": "Memphis Grizzlies", "GSW": "Golden State Warriors", 
+"WAS": "Washington Wizards", "CLE": "Cleveland Cavaliers", "LAC": "Los Angeles Clippers",
+"NYK": "New York Knicks", "BOS": "Boston Celtics", "NJN": "New Jersey Nets",
+"MLH": "Milwaukee Hawks", "STL": "St. Louis Hawks", "TOT": "Multiple teams",
+"PHO": "Phoenix Suns", "HOU": "Houston Rockets", "POR": "Portland Trailblazers",
+"SEA": "Seattle Supersonics", "SAS": "San Antonio Spurs", "CHH": "Charlotte Hornets",
+"ATL": "Atlanta Hawks", "ORL": "Orlando Magic", "MIA": "Miami Heat", "CHI": "Chicago Bulls",
+"KCK": "Kansas City Kings", "SAC": "Sacramento Kings", "MNL": "Minneapolis Lakers",
+"SDR": "San Diego Rockets", "BAL": "Baltimore Bullets", "CAP": "Capital Bullets",
+"WSB": "Washington Bullets", "TOR": "Toronto Raptors", "SYR": "Syracuse Nationals",
+"BRK": "Brooklyn Nets", "MIN": "Minnesota Timberwolves", "CIN": "Cincinnati Royals",
+"SDC": "San Diego Clippers", "CHP": "Chicago Packers", "CHZ": "Chicago Zephyrs",
+"NOJ": "New Orleans Jazz", "PHW": "Philadelphia Warriors"};
+
+var moreplayers = ["Kevin Durant", "James Harden", "Stephen Curry", "Russell Westbrook", 
+"Chris Paul", "Chris Webber", "Chris Bosh", "Dwight Howard", "Isiah Thomas",
+"Jamal Crawford", "Jason Kidd", "Jason Terry", "Mike Bibby", "Rudy Gay",
+"Scottie Pippen", "Steve Nash", "Tony Parker", "Paul George"];
+
 
 function alreadyExists(name) {
   for(t = 0 ; t < allplayers.length ; t++) {
@@ -36,6 +60,9 @@ function getBestPlayers() {
     if(total_points > 20000) {
       bestplayers.push(allplayers[r]);
     }
+    if(moreplayers.includes(allplayers[r].name.replace("*", ""))) {
+      bestplayers.push(allplayers[r]);
+    }
   }
   return bestplayers;
 }
@@ -46,9 +73,30 @@ function formatName(name) {
   return string;
 }
 
-function debugging(bestplayers) {
+function debugging1(bestplayers) {
   for(q = 0 ; q < bestplayers.length ; q++) {
-    console.log(bestplayers[q].name);
+    if(bestplayers[q].name.replace("*", "") == "Kobe Bryant") {
+      console.log(bestplayers[q].name);
+      for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
+        console.log(bestplayers[q].seasons[e].year);
+        console.log(bestplayers[q].seasons[e].playoffs);
+      }
+    }
+  // console.log("LENGTH: " + bestplayers.length);
+  }
+}
+
+function debugging2() {
+  for(q = 0 ; q < playoffsArr.length ; q++) {
+    console.log(playoffsArr[q].playoffYear);
+    for(w = playoffsArr[q].results.length - 1 ; w >= 0 ; w--) {
+      if(playoffsArr[q].results[w].series == "Finals") {
+        console.log("Champion: " + playoffsArr[q].results[w].winner);
+        console.log("Finalist: " + playoffsArr[q].results[w].loser);
+      } else {
+        console.log(playoffsArr[q].results[w].loser + " lost in " + playoffsArr[q].results[w].series);
+      }
+    }
   }
   console.log("LENGTH: " + bestplayers.length);
 }
@@ -61,10 +109,42 @@ function getIndex(player, bestplayers) {
   }
 }
 
+function yearExists(year) {
+  for(r = 0 ; r < playoffsArr.length ; r++) {
+    if(playoffsArr[r].playoffYear == year) {
+      return r;
+    }
+  }
+  return -1;
+}
+
+function checkPlayoffs(team, year) {
+  var index = yearExists(year);
+  if(index != -1) {
+    resultsArray = playoffsArr[index].results;
+    for(s = resultsArray.length - 1 ; s >= 0 ; s--) {
+      if(resultsArray[s].winner.startsWith(team) && resultsArray[s].series == "Finals") {
+        return "Champion";
+      }
+      if(resultsArray[s].loser.startsWith(team) && resultsArray[s].series == "Finals") {
+        return "Finals";
+      }
+      if(resultsArray[s].loser.startsWith(team) && resultsArray[s].series != "Finals") {
+        return resultsArray[s].series;
+      }
+    }
+  }
+  return "No Playoffs";
+}
+
+function getTeamName(team) {
+  return teammap[team];
+}
+
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
 width = 960 - margin.left - margin.right,
-height = 700 - margin.top - margin.bottom;
+height = 1400 - margin.top - margin.bottom;
 
 //adding svg to page
 var svg = d3.select("body").append("svg")
@@ -72,6 +152,30 @@ var svg = d3.select("body").append("svg")
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.csv("playoffs.csv", function(data) {
+  data.forEach(function(d) {
+    var year = +d.Yr;
+    var index = yearExists(year);
+
+    if(d.Lg == "NBA" && !d.Series.includes("Tiebreak")) {
+
+      if(index == -1) {
+
+        var playoffRound = {playoffYear: year, results: []};
+        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW}
+        playoffRound.results.push(result);
+        playoffsArr.push(playoffRound);
+
+      } else {
+
+        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW}
+        playoffsArr[index].results.push(result);
+      }
+    }
+  });
+});
+
 
 //reading in player data
 d3.csv("seasonstats.csv", function(data) {
@@ -81,11 +185,14 @@ d3.csv("seasonstats.csv", function(data) {
 
     if(index == -1) {
 
+      var playoffsResult = checkPlayoffs(getTeamName(d.Tm), +d.Year);
+
       var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
         rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
         plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
         age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
-        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC};
+        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
+        playoffs: playoffsResult};
 
       var player = {name: d.Player, seasons: []};
       player.seasons.push(season);
@@ -94,11 +201,14 @@ d3.csv("seasonstats.csv", function(data) {
 
     } else {
 
+      var playoffsResult = checkPlayoffs(getTeamName(d.Tm), +d.Year);
+
       var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
         rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
         plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
         age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
-        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC};
+        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
+        playoffs: playoffsResult};
 
       allplayers[index].seasons.push(season);
 
@@ -112,9 +222,10 @@ d3.csv("seasonstats.csv", function(data) {
     var x = a.name.toLowerCase();
     var y = b.name.toLowerCase();
     return x < y ? -1 : x > y ? 1 : 0;
-  });
+});
 
-  // debugging(bestplayers);
+  debugging1(bestplayers);
+  // debugging2();
 
   var select1 = d3.select('body')
     .append('select')
@@ -235,6 +346,23 @@ d3.csv("seasonstats.csv", function(data) {
   var index3 = getIndex(d3.select('select#one').property('value'), bestplayers);
   var index4 = getIndex(d3.select('select#two').property('value'), bestplayers);
 
+  function getMinPL(seasonArr1, seasonArr2) {
+    var min = 0;
+    for(t = 0 ; t < seasonArr1.length ; t++) {
+      var plusminus = seasonArr1[t].plusminus;
+      if(plusminus < min) {
+        min = plusminus;
+      }
+    }
+    for(w = 0 ; w < seasonArr2.length ; w++) {
+      var plusminus = seasonArr2[w].plusminus;
+      if(plusminus < min) {
+        min = plusminus;
+      }
+    }
+    return min;
+  }
+
   function getMax(which, seasonArr1, seasonArr2) {
     var max = 0;
     for(q = 0 ; q < seasonArr1.length ; q++) {
@@ -324,35 +452,41 @@ d3.csv("seasonstats.csv", function(data) {
   var maxBPG = getMax(3, bestplayers[index3].seasons, bestplayers[index4].seasons);
   var maxSPG = getMax(4, bestplayers[index3].seasons, bestplayers[index4].seasons);
   var maxPL = getMax(5, bestplayers[index3].seasons, bestplayers[index4].seasons);
+  var minPL = getMinPL(bestplayers[index3].seasons, bestplayers[index4].seasons);
 
   function getPPGScale(maxPPG) {
-    var ppgScale = d3.scaleLinear().domain([0,maxPPG + 6]).range([570,300]);
+    var ppgScale = d3.scaleLinear().domain([0,maxPPG + 5]).range([570,300]);
     return ppgScale;
   }
 
   function getAPGScale(maxAPG) {
-    var apgScale = d3.scaleLinear().domain([0,maxAPG + 6]).range([570,300]);
+    var apgScale = d3.scaleLinear().domain([0,maxAPG + 5]).range([570,300]);
     return apgScale;
   }
 
   function getRPGScale(maxRPG) {
-    var rpgScale = d3.scaleLinear().domain([0,maxRPG + 6]).range([570,300]);
+    var rpgScale = d3.scaleLinear().domain([0,maxRPG + 5]).range([570,300]);
     return rpgScale;
   }
 
   function getBPGScale(maxBPG) {
-    var bpgScale = d3.scaleLinear().domain([0,maxBPG + 6]).range([570,300]);
+    var bpgScale = d3.scaleLinear().domain([0,maxBPG]).range([570,300]);
     return bpgScale;
   }
 
   function getSPGScale(maxSPG) {
-    var spgScale = d3.scaleLinear().domain([0,maxSPG + 6]).range([570,300]);
+    var spgScale = d3.scaleLinear().domain([0,maxSPG]).range([570,300]);
     return spgScale;
   }
 
-  function getPlusMinusScale(maxPL) {
-    var plusminusScale = d3.scaleLinear().domain([-5,maxPL]).range([570,300]);
+  function getPlusMinusScale(maxPL, minPL) {
+    var plusminusScale = d3.scaleLinear().domain([minPL,maxPL]).range([570,300]);
     return plusminusScale;
+  }
+
+  function getOpacityScale(numberseasons) {
+    var opacityScale = d3.scaleLinear().domain([0, numberseasons]).range([0, 1]);
+    return opacityScale;
   }
 
   ppgScale = getPPGScale(maxPPG);
@@ -360,17 +494,139 @@ d3.csv("seasonstats.csv", function(data) {
   rpgScale = getRPGScale(maxRPG);
   bpgScale = getBPGScale(maxBPG);
   spgScale = getSPGScale(maxSPG)
-  plusminusScale = getPlusMinusScale(maxPL);
+  plusminusScale = getPlusMinusScale(maxPL, minPL);
+  opacityScale = getOpacityScale(bestplayers[index3].seasons.length);
 
   var labels = ['PPG', 'APG', 'RPG', 'BPG', 'SPG', '+/-'];
+
+  var playoffLabels = ['Champion', 'Finals', 
+  'Conference Finals', 'Conference Semifinals', '1st Round', 'No Playoffs'];
+
+  var yearLabels = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6',
+  'Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'Year 13',
+  'Year 14', 'Year 15', 'Year 16', 'Year 17', 'Year 18', 'Year 19', 'Year 20',
+  'Year 21', 'Year 22', 'Year 23', 'Year 24', 'Year 25'];
 
   var xScale1 = d3.scaleOrdinal()
     .domain(labels)
     .range([0, 120, 240, 360, 480, 600]);
 
-  var opacityScale = d3.scaleLinear()
-    .domain([0, 20])
-    .range([0, 1]);
+//overview line chart creation
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(300, 680)")
+      .style("text-anchor", "middle")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("Playoff Results for Each Season")
+      .attr("fill", "black");
+
+  xScale3 = setupOverview(index3, index4);
+
+  function setupOverview(index1, index2) {
+
+      if(bestplayers[index2].seasons.length > bestplayers[index1].seasons.length) {
+
+        var slicedArr = yearLabels.slice(0, bestplayers[index2].seasons.length);
+
+        var xScale2 = d3.scaleBand()
+          .domain(slicedArr)
+          .range([0, width - 200]);
+
+        var xScale3 = d3.scaleLinear()
+          .domain([0, slicedArr.length])
+          .range([0, width - 200]);
+
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("id", "overview")
+        .attr("transform", "translate(60, 1050)")
+        .call(d3.axisBottom(xScale2));
+
+      } else {
+
+        var slicedArr = yearLabels.slice(0, bestplayers[index1].seasons.length);
+
+        var xScale2 = d3.scaleBand()
+          .domain(slicedArr)
+          .range([0, width - 200]);
+
+        var xScale3 = d3.scaleLinear()
+          .domain([0, slicedArr.length])
+          .range([0, width - 200]); 
+
+        svg.append("g")
+        .attr("class", "x axis")
+        .attr("id", "overview")
+        .attr("transform", "translate(60, 1050)")
+        .call(d3.axisBottom(xScale2));
+
+      }
+      return xScale3;
+  }
+
+  var yScalePlayoffs = d3.scaleOrdinal()
+    .domain(playoffLabels)
+    .range([0, 60, 120, 180, 240, 300]);
+
+  svg.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(60, 750)")
+    .call(d3.axisLeft(yScalePlayoffs));
+
+  createOverview(index3, "blue", "one", xScale3);
+  createOverview(index4, "red", "two", xScale3);
+
+  function createOverview(index, color, which, xScale) {
+
+    var line = d3.line()
+      .x(function(d, i) { return xScale(i); })
+      .y(function(d) { return getOverviewPos(d)});
+
+    svg.append("path")
+      .datum(bestplayers[index].seasons)
+      .attr("id", which)
+      .attr("class", "line")
+      .attr("transform", "translate(81, 750)")
+      .attr("d", line)
+      .attr("stroke", color)
+      .attr("stroke-width", 2)
+      .attr("fill", "none");
+
+    svg.selectAll(".dot" + which)
+      .data(bestplayers[index].seasons)
+      .enter().append("circle")
+      .attr("id", function(d, i) { return 'circle_' + which + '_' + i})
+      .attr("class", "dot")
+      .attr("cx", function(d, i) { return xScale3(i); })
+      .attr("cy", function(d) { return getOverviewPos(d); })
+      .attr("transform", "translate(81, 750)")
+      .attr("fill", color)
+      .attr("r", 5);
+
+    }
+
+    function getOverviewPos(seasonObj) {
+      if(seasonObj.playoffs == "No Playoffs") {
+        return 300;
+      }
+      if(seasonObj.playoffs.includes("First Round")) {
+        return 240;
+      }
+      if(seasonObj.playoffs.includes("Semifinals")) {
+        return 180;
+      }
+      if(seasonObj.playoffs.includes("Conf") && seasonObj.playoffs.includes("Finals")) {
+        return 120;
+      }
+      if(seasonObj.playoffs == "Finals") {
+        return 60;
+      }
+      if(seasonObj.playoffs == "Champion") {
+        return 0;
+      }
+    }
 
   svg.append("g")
       .attr("id", "yone")
@@ -405,16 +661,17 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("id", "ysix")
       .attr("class", "y axis")
       .attr("transform", "translate(600, 0)")
-      .call(d3.axisLeft(getPlusMinusScale(maxPL)));
+      .call(d3.axisLeft(getPlusMinusScale(maxPL, minPL)));
 
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0, 585)")
       .call(d3.axisBottom(xScale1));
 
-  var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale];
+  var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale, opacityScale];
 
   drawLines(index3, "blue", "one", scales);
+  scales[6] = getOpacityScale(bestplayers[index4].seasons.length);
   drawLines(index4, "red", "two", scales);
   drawLegend(d3.select('select#one').property('value'), d3.select('select#two').property('value'));
 
@@ -444,6 +701,8 @@ d3.csv("seasonstats.csv", function(data) {
     bpgScale = scales[3];
     spgScale = scales[4];
     plusminusScale = scales[5];
+    opacityScale = scales[6];
+
     if(start == 0) {
       var y1 = ppgScale(stat1);
       var y2 = apgScale(stat2);
@@ -538,7 +797,21 @@ d3.csv("seasonstats.csv", function(data) {
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player1)
-      .attr("fill", "black");
+      .attr("fill", "black")
+      .on("mouseover", function() {
+        for(a = 0 ; a < 600 ; a++) {
+          for(r = 0 ; r < 20 ; r++) {
+            d3.select('#line' + a + "_" + r + "two").style("opacity", 0);
+          }
+        }
+      })
+      .on("mouseout", function() {
+        for(a = 0 ; a < 600 ; a++) {
+          for(r = 0 ; r < 20 ; r++) {
+            d3.select('#line' + a + "_" + r + "two").style("opacity", 1);
+          }
+        }
+      });
 
     svg.append("text")  
       .attr("id", "legendtwo")          
@@ -547,7 +820,21 @@ d3.csv("seasonstats.csv", function(data) {
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player2)
-      .attr("fill", "black");
+      .attr("fill", "black")
+      .on("mouseover", function() {
+        for(a = 0 ; a < 600 ; a++) {
+          for(r = 0 ; r < 20 ; r++) {
+            d3.select('#line' + a + "_" + r + "one").style("opacity", 0);
+          }
+        }
+      })
+      .on("mouseout", function() {
+        for(a = 0 ; a < 600 ; a++) {
+          for(r = 0 ; r < 20 ; r++) {
+            d3.select('#line' + a + "_" + r + "one").style("opacity", 1);
+          }
+        }
+      });
 
     svg.append("text")            
       .attr("transform",
@@ -581,6 +868,16 @@ d3.csv("seasonstats.csv", function(data) {
     d3.select('#yfour').remove();
     d3.select('#yfive').remove();
     d3.select('#ysix').remove();
+
+    console.log(d3.select('#circle_' + 'one' + '_' + 3));
+    for(k = 0 ; k < 25 ; k++) {
+      d3.select('#circle_' + 'one' + '_' + k).remove();
+      d3.select('#circle_' + 'two' + '_' + k).remove();
+    }
+
+    d3.select('path#' + 'one').remove();
+    d3.select('path#' + 'two').remove();
+    d3.select('#overview').remove();
     
     var index1 = getIndex(selectValue, bestplayers);
     var index2 = getIndex(selectValueOther, bestplayers);
@@ -590,20 +887,29 @@ d3.csv("seasonstats.csv", function(data) {
     var maxBPG = getMax(3, bestplayers[index1].seasons, bestplayers[index2].seasons);
     var maxSPG = getMax(4, bestplayers[index1].seasons, bestplayers[index2].seasons);
     var maxPL = getMax(5, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var minPL = getMinPL(bestplayers[index1].seasons, bestplayers[index2].seasons);
 
     ppgScale = getPPGScale(maxPPG);
     apgScale = getAPGScale(maxAPG);
     rpgScale = getRPGScale(maxRPG);
     bpgScale = getBPGScale(maxBPG);
     spgScale = getSPGScale(maxSPG)
-    plusminusScale = getPlusMinusScale(maxPL);
+    plusminusScale = getPlusMinusScale(maxPL, minPL);
+    opacityScale = getOpacityScale(bestplayers[index1].seasons.length);
 
-    var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale];
+    var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale, opacityScale];
 
     drawAxes(scales);
 
     drawLines(index1, "blue", "one", scales);
+
+    scales[6] = getOpacityScale(bestplayers[index2].seasons.length);
     drawLines(index2, "red", "two", scales);
+
+    xScale3 = setupOverview(index1, index2);
+
+    createOverview(index1, "blue", "one", xScale3);
+    createOverview(index2, "red", "two", xScale3);
   };
 
   function onchange2() {
@@ -615,6 +921,7 @@ d3.csv("seasonstats.csv", function(data) {
     for(a = 0 ; a < 600 ; a++) {
       for(r = 0 ; r < 20 ; r++) {
         d3.select('#line' + a + "_" + r + "one").remove();
+        d3.select('#circle_' + 'one' + '_' + r)
       }
     }
     for(a = 0 ; a < 600 ; a++) {
@@ -629,28 +936,44 @@ d3.csv("seasonstats.csv", function(data) {
     d3.select('#yfive').remove();
     d3.select('#ysix').remove();
 
-    var index1 = getIndex(selectValue, bestplayers);
-    var index2 = getIndex(selectValueOther, bestplayers);
+    for(k = 0 ; k < 25 ; k++) {
+      d3.select('#circle_' + 'one' + '_' + k).remove();
+      d3.select('#circle_' + 'two' + '_' + k).remove();
+    }
+
+    d3.select('path#' + 'one').remove();
+    d3.select('path#' + 'two').remove();
+    d3.select('#overview').remove();
+
+    var index2 = getIndex(selectValue, bestplayers);
+    var index1 = getIndex(selectValueOther, bestplayers);
     var maxPPG = getMax(0, bestplayers[index1].seasons, bestplayers[index2].seasons);
     var maxAPG = getMax(1, bestplayers[index1].seasons, bestplayers[index2].seasons);
     var maxRPG = getMax(2, bestplayers[index1].seasons, bestplayers[index2].seasons);
     var maxBPG = getMax(3, bestplayers[index1].seasons, bestplayers[index2].seasons);
     var maxSPG = getMax(4, bestplayers[index1].seasons, bestplayers[index2].seasons);
     var maxPL = getMax(5, bestplayers[index1].seasons, bestplayers[index2].seasons);
+    var minPL = getMinPL(bestplayers[index1].seasons, bestplayers[index2].seasons);
 
     ppgScale = getPPGScale(maxPPG);
     apgScale = getAPGScale(maxAPG);
     rpgScale = getRPGScale(maxRPG);
     bpgScale = getBPGScale(maxBPG);
     spgScale = getSPGScale(maxSPG)
-    plusminusScale = getPlusMinusScale(maxPL);
+    plusminusScale = getPlusMinusScale(maxPL, minPL);
+    opacityScale = getOpacityScale(bestplayers[index1].seasons.length);
 
-    var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale];
+    var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale, opacityScale];
 
     drawAxes(scales);
 
-    drawLines(index1, "red", "two", scales);
-    drawLines(index2, "blue", "one", scales);
+    drawLines(index2, "red", "two", scales);
+    scales[6] = getOpacityScale(bestplayers[index2].seasons.length);
+    drawLines(index1, "blue", "one", scales);
+    xScale3 = setupOverview(index1, index2);
+
+    createOverview(index1, "blue", "one", xScale3);
+    createOverview(index2, "red", "two", xScale3);
   };
 
   function drawAxes(scales) {
