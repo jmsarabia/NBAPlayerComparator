@@ -18,13 +18,13 @@ var playoffsArr = [];
 
 var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers", 
 "LAL": "Los Angeles Lakers", "UTA": "Utah Jazz", "DET": "Detroit Pistons",
-"DAL": "Dallas Mavericks", "MIL": "Milwaukee Bucks", "DEV": "Denver Nuggets",
+"DAL": "Dallas Mavericks", "MIL": "Milwaukee Bucks", "DEN": "Denver Nuggets",
 "PHI": "Philadelphia 76ers", "MEM": "Memphis Grizzlies", "GSW": "Golden State Warriors", 
 "WAS": "Washington Wizards", "CLE": "Cleveland Cavaliers", "LAC": "Los Angeles Clippers",
 "NYK": "New York Knicks", "BOS": "Boston Celtics", "NJN": "New Jersey Nets",
 "MLH": "Milwaukee Hawks", "STL": "St. Louis Hawks", "TOT": "Multiple teams",
 "PHO": "Phoenix Suns", "HOU": "Houston Rockets", "POR": "Portland Trailblazers",
-"SEA": "Seattle Supersonics", "SAS": "San Antonio Spurs", "CHH": "Charlotte Hornets",
+"SEA": "Seattle SuperSonics", "SAS": "San Antonio Spurs", "CHH": "Charlotte Hornets",
 "ATL": "Atlanta Hawks", "ORL": "Orlando Magic", "MIA": "Miami Heat", "CHI": "Chicago Bulls",
 "KCK": "Kansas City Kings", "SAC": "Sacramento Kings", "MNL": "Minneapolis Lakers",
 "SDR": "San Diego Rockets", "BAL": "Baltimore Bullets", "CAP": "Capital Bullets",
@@ -74,11 +74,12 @@ function formatName(name) {
 
 function debugging1(bestplayers) {
   for(q = 0 ; q < bestplayers.length ; q++) {
-    if(bestplayers[q].name.replace("*", "") == "Kobe Bryant") {
+    if(bestplayers[q].name.replace("*", "") == "Carmelo Anthony") {
       console.log(bestplayers[q].name);
       for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
         console.log(bestplayers[q].seasons[e].year);
         console.log(bestplayers[q].seasons[e].playoffs);
+        console.log(bestplayers[q].seasons[e].team);
       }
     }
   // console.log("LENGTH: " + bestplayers.length);
@@ -223,7 +224,7 @@ d3.csv("seasonstats.csv", function(data) {
     return x < y ? -1 : x > y ? 1 : 0;
 });
 
-  // debugging1(bestplayers);
+  debugging1(bestplayers);
   // debugging2();
 
   var select1 = d3.select('body')
