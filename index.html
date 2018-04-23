@@ -18,7 +18,7 @@ var playoffsArr = [];
 
 var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers", 
 "LAL": "Los Angeles Lakers", "UTA": "Utah Jazz", "DET": "Detroit Pistons",
-"DAL": "Dallas Mavericks", "MIL": "Milwaukee Bucks", "DEN": "Denver Nuggets",
+"DAL": "Dallas Mavericks", "MIL": "Milwaukee Bucks", "DEN": "Denver Nuggets", "DEV": "Denver Nuggets",
 "PHI": "Philadelphia 76ers", "MEM": "Memphis Grizzlies", "GSW": "Golden State Warriors", 
 "WAS": "Washington Wizards", "CLE": "Cleveland Cavaliers", "LAC": "Los Angeles Clippers",
 "NYK": "New York Knicks", "BOS": "Boston Celtics", "NJN": "New Jersey Nets",
@@ -124,17 +124,17 @@ function checkPlayoffs(team, year) {
     resultsArray = playoffsArr[index].results;
     for(s = resultsArray.length - 1 ; s >= 0 ; s--) {
       if(resultsArray[s].winner.startsWith(team) && resultsArray[s].series == "Finals") {
-        return "Champion";
+        return ["Champion", resultsArray[s].winner, resultsArray[s].loser, resultsArray[s].gW, resultsArray[s].gL];
       }
       if(resultsArray[s].loser.startsWith(team) && resultsArray[s].series == "Finals") {
-        return "Finals";
+        return ["Finals", resultsArray[s].winner, resultsArray[s].loser, resultsArray[s].gW, resultsArray[s].gL];
       }
       if(resultsArray[s].loser.startsWith(team) && resultsArray[s].series != "Finals") {
-        return resultsArray[s].series;
+        return [resultsArray[s].series, resultsArray[s].winner, resultsArray[s].loser, resultsArray[s].gW, resultsArray[s].gL];
       }
     }
   }
-  return "No Playoffs";
+  return ["No Playoffs"];
 }
 
 function getTeamName(team) {
@@ -161,15 +161,14 @@ d3.csv("playoffs.csv", function(data) {
     if(d.Lg == "NBA" && !d.Series.includes("Tiebreak")) {
 
       if(index == -1) {
-
         var playoffRound = {playoffYear: year, results: []};
-        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW}
+        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW, gW: +d.GamesW, gL: +d.GamesL};
         playoffRound.results.push(result);
         playoffsArr.push(playoffRound);
 
       } else {
 
-        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW}
+        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW, gW: +d.GamesW, gL: +d.GamesL};
         playoffsArr[index].results.push(result);
       }
     }
@@ -224,7 +223,7 @@ d3.csv("seasonstats.csv", function(data) {
     return x < y ? -1 : x > y ? 1 : 0;
 });
 
-  debugging1(bestplayers);
+  // debugging1(bestplayers);
   // debugging2();
 
   var select1 = d3.select('body')
@@ -494,7 +493,7 @@ d3.csv("seasonstats.csv", function(data) {
   apgScale = getAPGScale(maxAPG);
   rpgScale = getRPGScale(maxRPG);
   bpgScale = getBPGScale(maxBPG);
-  spgScale = getSPGScale(maxSPG)
+  spgScale = getSPGScale(maxSPG);
   plusminusScale = getPlusMinusScale(maxPL, minPL);
   opacityScale = getOpacityScale(bestplayers[index3].seasons.length);
 
@@ -604,27 +603,35 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("cy", function(d) { return getOverviewPos(d); })
       .attr("transform", "translate(81, 750)")
       .attr("fill", color)
-      .attr("r", 5);
+      .attr("r", 5)
+      .append("svg:title")
+          .text(function(d, i) { if(d.playoffs.length > 1) {
+            return d.playoffs[1] + " - " + d.playoffs[3] + ", " + d.playoffs[2] + " - " + d.playoffs[4];
+          }  else {
+            return "Did not make playoffs";
+          }
+        });
 
     }
 
     function getOverviewPos(seasonObj) {
+
       if(seasonObj.playoffs == "No Playoffs") {
         return 300;
       }
-      if(seasonObj.playoffs.includes("First Round")) {
+      if(seasonObj.playoffs[0].includes("First Round")) {
         return 240;
       }
-      if(seasonObj.playoffs.includes("Semifinals")) {
+      if(seasonObj.playoffs[0].includes("Semifinals")) {
         return 180;
       }
-      if(seasonObj.playoffs.includes("Conf") && seasonObj.playoffs.includes("Finals")) {
+      if(seasonObj.playoffs[0].includes("Conf") && seasonObj.playoffs[0].includes("Finals")) {
         return 120;
       }
-      if(seasonObj.playoffs == "Finals") {
+      if(seasonObj.playoffs[0] == "Finals") {
         return 60;
       }
-      if(seasonObj.playoffs == "Champion") {
+      if(seasonObj.playoffs[0] == "Champion") {
         return 0;
       }
     }
@@ -656,7 +663,7 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("id", "yfive")
       .attr("class", "y axis")
       .attr("transform", "translate(480, 0)")
-      .call(d3.axisLeft(getSPGScale(maxPPG)));   
+      .call(d3.axisLeft(getSPGScale(maxSPG)));   
 
   svg.append("g")
       .attr("id", "ysix")
