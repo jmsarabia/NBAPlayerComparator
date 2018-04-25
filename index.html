@@ -4,6 +4,20 @@
     <meta charset="utf-8">
     <title>NBA Player Comparator</title>
     <style type="text/css">
+
+div.tooltip { 
+    position: absolute;     
+    text-align: center;     
+    width: 200px;          
+    height: 80px;         
+    padding: 4px;       
+    font: 12px sans-serif;    
+    background: cornflowerblue; 
+    border: 0px;    
+    border-radius: 8px;     
+    pointer-events: none;     
+}
+
     </style>
   </head>
 <body>
@@ -31,12 +45,14 @@ var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers",
 "WSB": "Washington Bullets", "TOR": "Toronto Raptors", "SYR": "Syracuse Nationals",
 "BRK": "Brooklyn Nets", "MIN": "Minnesota Timberwolves", "CIN": "Cincinnati Royals",
 "SDC": "San Diego Clippers", "CHP": "Chicago Packers", "CHZ": "Chicago Zephyrs",
-"NOJ": "New Orleans Jazz", "PHW": "Philadelphia Warriors"};
+"NOJ": "New Orleans Jazz", "PHW": "Philadelphia Warriors", "OKC": "Oklahoma City Thunder",
+"NOK": "New Orleans Hornets", "NOH": "New Orleans Hornets"};
 
 var moreplayers = ["Kevin Durant", "James Harden", "Stephen Curry", "Russell Westbrook", 
 "Chris Paul", "Chris Webber", "Chris Bosh", "Dwight Howard", "Isiah Thomas",
 "Jamal Crawford", "Jason Kidd", "Jason Terry", "Mike Bibby", "Rudy Gay",
-"Scottie Pippen", "Steve Nash", "Tony Parker", "Paul George"];
+"Scottie Pippen", "Steve Nash", "Tony Parker", "Paul George", "Bob Lanier",
+"Bob McAdoo", "Clifford Robinson", "Walter Davis"];
 
 
 function alreadyExists(name) {
@@ -57,6 +73,7 @@ function getBestPlayers() {
       total_points += seasons_arr[e].points;
     }
     if(total_points > 20000) {
+      // console.log(allplayers[r].name);
       bestplayers.push(allplayers[r]);
     }
     if(moreplayers.includes(allplayers[r].name.replace("*", ""))) {
@@ -74,12 +91,18 @@ function formatName(name) {
 
 function debugging1(bestplayers) {
   for(q = 0 ; q < bestplayers.length ; q++) {
-    if(bestplayers[q].name.replace("*", "") == "Carmelo Anthony") {
+    if(bestplayers[q].name.replace("*", "") == "Chris Paul") {
       console.log(bestplayers[q].name);
       for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
         console.log(bestplayers[q].seasons[e].year);
         console.log(bestplayers[q].seasons[e].playoffs);
-        console.log(bestplayers[q].seasons[e].team);
+        if(bestplayers[q].seasons[e].team.length > 1) {
+          for(w = 0 ; w < bestplayers[q].seasons[e].team.length ; w++) {
+            console.log(bestplayers[q].seasons[e].team[w]);
+          }
+        } else {
+          console.log(bestplayers[q].seasons[e].team[0]);
+        }
       }
     }
   // console.log("LENGTH: " + bestplayers.length);
@@ -101,6 +124,15 @@ function debugging2() {
   console.log("LENGTH: " + bestplayers.length);
 }
 
+function yearAdded(index, year) {
+  for(s = 0 ; s < allplayers[index].seasons.length ; s++) {
+    if(allplayers[index].seasons[s].year == year) {
+      return s;
+    }
+  }
+  return -1;
+}
+
 function getIndex(player, bestplayers) {
   for(g = 0 ; g < bestplayers.length ; g++) {
     if(bestplayers[g].name.replace("*", "") == player) {
@@ -116,6 +148,22 @@ function yearExists(year) {
     }
   }
   return -1;
+}
+
+function setPlayoffs(bestplayers) {
+  for(p = 0 ; p < bestplayers.length ; p++) {
+    for(y = 0 ; y < bestplayers[p].seasons.length ; y++) {
+      var numberteams = bestplayers[p].seasons[y].team.length;
+      if(numberteams == 1) {
+        var teamName = getTeamName(bestplayers[p].seasons[y].team[0]);
+      } else {
+        var teamName = getTeamName(bestplayers[p].seasons[y].team[numberteams - 1]);
+      }
+      var year = bestplayers[p].seasons[y].year;
+      var playoffsResult = checkPlayoffs(teamName, year);
+      bestplayers[p].seasons[y].playoffs = playoffsResult;
+    }
+  }
 }
 
 function checkPlayoffs(team, year) {
@@ -145,6 +193,10 @@ function getTeamName(team) {
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
 width = 960 - margin.left - margin.right,
 height = 1400 - margin.top - margin.bottom;
+
+var div = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);
 
 //adding svg to page
 var svg = d3.select("body").append("svg")
@@ -184,14 +236,12 @@ d3.csv("seasonstats.csv", function(data) {
 
     if(index == -1) {
 
-      var playoffsResult = checkPlayoffs(getTeamName(d.Tm), +d.Year);
-
       var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
         rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
-        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
+        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
         age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
         fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-        playoffs: playoffsResult};
+        playoffs: null};
 
       var player = {name: d.Player, seasons: []};
       player.seasons.push(season);
@@ -200,22 +250,30 @@ d3.csv("seasonstats.csv", function(data) {
 
     } else {
 
-      var playoffsResult = checkPlayoffs(getTeamName(d.Tm), +d.Year);
+      var yearIndex = yearAdded(index, +d.Year);
 
-      var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
-        rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
-        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
-        age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
-        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-        playoffs: playoffsResult};
+      if(yearIndex == -1) {
 
-      allplayers[index].seasons.push(season);
+        var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
+          rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
+          plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
+          age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
+          fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
+          playoffs: null};
+
+          allplayers[index].seasons.push(season);
+
+      } else {
+
+        allplayers[index].seasons[yearIndex].team.push(d.Tm);
+
+      }
 
     }
-
   });
 
   bestplayers = getBestPlayers();
+  setPlayoffs(bestplayers);
 
   bestplayers.sort(function(a,b) {
     var x = a.name.toLowerCase();
@@ -271,15 +329,6 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("height", 100)       // set the x corner curve radius
     .attr("ry", 10)
     .style("fill", "CornflowerBlue");
-
-  // svg.append("rect")
-  //   .attr("x", -50)
-  //   .attr("y", -50)
-  //   .attr("width", 175)
-  //   .attr("height", 30)       // set the x corner curve radius
-  //   .attr("ry", 10)  
-  //   .style("fill", "DarkGrey")
-  //   .style("opacity", 1);
 
   svg.append("text")             
     .attr("transform",
@@ -578,6 +627,44 @@ d3.csv("seasonstats.csv", function(data) {
   createOverview(index3, "blue", "one", xScale3);
   createOverview(index4, "red", "two", xScale3);
 
+  function getPlayerName(id) {
+    if(id.includes("one")) {
+      var playerNameInd = getIndex(d3.select('select#one').property('value'), bestplayers);
+      var playerName = bestplayers[playerNameInd].name.replace("*", "");
+    } else {
+      var playerNameInd = getIndex(d3.select('select#two').property('value'), bestplayers);
+      var playerName = bestplayers[playerNameInd].name.replace("*", "");
+    }
+    return playerName;
+  }
+
+  function getDivInfo(seasonObject, id) {
+    var playerName = getPlayerName(id);
+    var index = seasonObject.team.length;
+    var info = "<font color='white'>" + "Player: " + playerName + "<br/>";
+    info += "Team: " + seasonObject.team[index - 1] + "<br/>";
+    info += "Player Age: " + seasonObject.age + "<br/>";
+    info += "Series: " + seasonObject.playoffs[1] + " - " + seasonObject.playoffs[3] + 
+    ", " + seasonObject.playoffs[2] + " - " + seasonObject.playoffs[4] + "</font>";
+    return info;
+  }
+
+  function getPixels(id) {
+    if(id.includes("one")) {
+      return (d3.event.pageX - 220) + "px"; 
+    } else {
+      return (d3.event.pageX + 20) + "px";
+    }
+  }
+
+  function getColor(id) {
+    if(id.includes("one")) {
+      return "DarkBlue";
+    } else {
+      return "DarkRed";
+    }
+  }
+
   function createOverview(index, color, which, xScale) {
 
     var line = d3.line()
@@ -604,14 +691,36 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("transform", "translate(81, 750)")
       .attr("fill", color)
       .attr("r", 5)
-      .append("svg:title")
-          .text(function(d, i) { if(d.playoffs.length > 1) {
-            return d.playoffs[1] + " - " + d.playoffs[3] + ", " + d.playoffs[2] + " - " + d.playoffs[4];
-          }  else {
-            return "Did not make playoffs";
-          }
+      .on("mouseover", function(d) {  
+        if(d.playoffs.length > 1) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9); 
+            div.html(getDivInfo(d, this.id))
+                .style("left", getPixels(this.id))   
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("background", getColor(this.id));
+        } else {
+            var index = d.team.length;
+            var playerName = getPlayerName(this.id);
+            var info = "<font color='white'>" + "Player: " + playerName;
+            info += "Team: " + d.team[index - 1] + "<br/>";
+            info += "Player Age: " + d.age + "<br/>" + "<br/>";
+            info += "Did not make playoffs" + "</font>";
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9); 
+            div .html(info)
+                .style("left", (d3.event.pageX) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("background", getColor(this.id));  
+            }
+        })     
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
         });
-
     }
 
     function getOverviewPos(seasonObj) {
@@ -626,6 +735,9 @@ d3.csv("seasonstats.csv", function(data) {
         return 180;
       }
       if(seasonObj.playoffs[0].includes("Conf") && seasonObj.playoffs[0].includes("Finals")) {
+        return 120;
+      }
+      if(seasonObj.playoffs[0].includes("Div") && seasonObj.playoffs[0].includes("Finals")) {
         return 120;
       }
       if(seasonObj.playoffs[0] == "Finals") {
