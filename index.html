@@ -341,7 +341,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
     .attr("transform",
-          "translate(300, 270)")
+          "translate(350, 270)")
     .style("text-anchor", "middle")
     .style("font-size", "20px")
     .text("Average Stats for Each Season")
@@ -564,7 +564,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
       .attr("transform",
-          "translate(300, 680)")
+          "translate(350, 680)")
       .style("text-anchor", "middle")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "20px")
@@ -751,41 +751,42 @@ d3.csv("seasonstats.csv", function(data) {
   svg.append("g")
       .attr("id", "yone")
       .attr("class", "y axis")
+      .attr("transform", "translate(60, 0)")
       .call(d3.axisLeft(getPPGScale(maxPPG)));
 
   svg.append("g")
       .attr("id", "ytwo")
       .attr("class", "y axis")
-      .attr("transform", "translate(120, 0)")
+      .attr("transform", "translate(180, 0)")
       .call(d3.axisLeft(getAPGScale(maxAPG)));
 
   svg.append("g")
       .attr("id", "ythree")
       .attr("class", "y axis")
-      .attr("transform", "translate(240, 0)")
+      .attr("transform", "translate(300, 0)")
       .call(d3.axisLeft(getRPGScale(maxRPG)));
 
   svg.append("g")
       .attr("id", "yfour")
       .attr("class", "y axis")
-      .attr("transform", "translate(360, 0)")
+      .attr("transform", "translate(420, 0)")
       .call(d3.axisLeft(getBPGScale(maxBPG)));
 
   svg.append("g")
       .attr("id", "yfive")
       .attr("class", "y axis")
-      .attr("transform", "translate(480, 0)")
+      .attr("transform", "translate(540, 0)")
       .call(d3.axisLeft(getSPGScale(maxSPG)));   
 
   svg.append("g")
       .attr("id", "ysix")
       .attr("class", "y axis")
-      .attr("transform", "translate(600, 0)")
+      .attr("transform", "translate(660, 0)")
       .call(d3.axisLeft(getPlusMinusScale(maxPL, minPL)));
 
   svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0, 585)")
+      .attr("transform", "translate(60, 585)")
       .call(d3.axisBottom(xScale1));
 
   var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale, opacityScale];
@@ -805,11 +806,11 @@ d3.csv("seasonstats.csv", function(data) {
       var spg = bestplayers[index].seasons[r].steals/games;
       var plusminus = bestplayers[index].seasons[r].plusminus;
 
-      drawLine(0, 120, color, r, ppg, apg, numb, scales);
-      drawLine(120, 240, color, r, apg, rpg, numb, scales);
-      drawLine(240, 360, color, r, rpg, bpg, numb, scales);
-      drawLine(360, 480, color, r, bpg, spg, numb, scales);
-      drawLine(480, 600, color, r, spg, plusminus, numb, scales);
+      drawLine(60, 180, color, r, ppg, apg, numb, scales);
+      drawLine(180, 300, color, r, apg, rpg, numb, scales);
+      drawLine(300, 420, color, r, rpg, bpg, numb, scales);
+      drawLine(420, 540, color, r, bpg, spg, numb, scales);
+      drawLine(540, 660, color, r, spg, plusminus, numb, scales);
     }
   }
 
@@ -823,23 +824,23 @@ d3.csv("seasonstats.csv", function(data) {
     plusminusScale = scales[5];
     opacityScale = scales[6];
 
-    if(start == 0) {
+    if(start == 60) {
       var y1 = ppgScale(stat1);
       var y2 = apgScale(stat2);
     }
-    if(start == 120) {
+    if(start == 180) {
       var y1 = apgScale(stat1);
       var y2 = rpgScale(stat2);
     }
-    if(start == 240) {
+    if(start == 300) {
       var y1 = rpgScale(stat1);
       var y2 = bpgScale(stat2);
     } 
-    if(start == 360) {
+    if(start == 420) {
       var y1 = bpgScale(stat1);
       var y2 = spgScale(stat2);
     }
-    if(start == 480) {
+    if(start == 540) {
       var y1 = spgScale(stat1);
       var y2 = plusminusScale(stat2);
     }   
@@ -857,55 +858,47 @@ d3.csv("seasonstats.csv", function(data) {
 
   function drawLegend(player1, player2) {
     svg.append("line")
-      .attr("x1", -40)
+      .attr("x1", 650) //-40
       .attr("y1", 180)
-      .attr("x2", -40)
+      .attr("x2", 650) //-40
       .attr("y2", 260)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
-      .attr("x1", 125)
+      .attr("x1", 815)
       .attr("y1", 180)
-      .attr("x2", 125)
+      .attr("x2", 815)
       .attr("y2", 260)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
-      .attr("x1", -40)
-      .attr("y1", 181)
-      .attr("x2", 125)
-      .attr("y2", 181)
+      .attr("x1", 650)
+      .attr("y1", 180)
+      .attr("x2", 815)
+      .attr("y2", 180)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
-      .attr("x1", -40)
+      .attr("x1", 650)
       .attr("y1", 259)
-      .attr("x2", 125)
+      .attr("x2", 815)
       .attr("y2", 259)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
-      .attr("x1", -40)
-      .attr("y1", 259)
-      .attr("x2", 125)
-      .attr("y2", 259)
-      .attr("stroke-width", 3)
-      .attr("stroke", "black");
-
-    svg.append("line")
-      .attr("x1", -30)
+      .attr("x1", 660)
       .attr("y1", 207)
-      .attr("x2", -4)
+      .attr("x2", 686)
       .attr("y2", 207)
       .attr("stroke-width", 5)
       .attr("stroke", "blue");
 
     svg.append("line")
-      .attr("x1", -30)
+      .attr("x1", 660)
       .attr("y1", 235)
-      .attr("x2", -4)
+      .attr("x2", 686)
       .attr("y2", 235)
       .attr("stroke-width", 5)
       .attr("stroke", "red");
@@ -913,7 +906,7 @@ d3.csv("seasonstats.csv", function(data) {
     svg.append("text")   
       .attr("id", "legendone")          
       .attr("transform",
-          "translate(55, 210)")
+          "translate(735, 210)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player1)
@@ -937,7 +930,7 @@ d3.csv("seasonstats.csv", function(data) {
     svg.append("text")  
       .attr("id", "legendtwo")          
       .attr("transform",
-          "translate(55, 238)")
+          "translate(735, 238)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player2)
@@ -960,9 +953,9 @@ d3.csv("seasonstats.csv", function(data) {
 
     svg.append("text")            
       .attr("transform",
-          "translate(40, 170)")
+          "translate(730, 170)")
       .style("text-anchor", "middle")
-      .style("font-size", "18px")
+      .style("font-size", "14px")
       .text("Legend")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .attr("fill", "black");
@@ -1102,36 +1095,37 @@ d3.csv("seasonstats.csv", function(data) {
     svg.append("g")
       .attr("id", "yone")
       .attr("class", "y axis")
+      .attr("transform", "translate(60, 0)")
       .call(d3.axisLeft(scales[0]));
 
     svg.append("g")
       .attr("id", "ytwo")
       .attr("class", "y axis")
-      .attr("transform", "translate(120, 0)")
+      .attr("transform", "translate(180, 0)")
       .call(d3.axisLeft(scales[1]));
 
     svg.append("g")
       .attr("id", "ythree")
       .attr("class", "y axis")
-      .attr("transform", "translate(240, 0)")
+      .attr("transform", "translate(300, 0)")
       .call(d3.axisLeft(scales[2]));
 
     svg.append("g")
       .attr("id", "yfour")
       .attr("class", "y axis")
-      .attr("transform", "translate(360, 0)")
+      .attr("transform", "translate(420, 0)")
       .call(d3.axisLeft(scales[3]));
 
     svg.append("g")
       .attr("id", "yfive")
       .attr("class", "y axis")
-      .attr("transform", "translate(480, 0)")
+      .attr("transform", "translate(540, 0)")
       .call(d3.axisLeft(scales[4]));   
 
     svg.append("g")
       .attr("id", "ysix")
       .attr("class", "y axis")
-      .attr("transform", "translate(600, 0)")
+      .attr("transform", "translate(660, 0)")
       .call(d3.axisLeft(scales[5]));
   }
 
