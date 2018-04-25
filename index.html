@@ -43,7 +43,7 @@ var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers",
 "WAS": "Washington Wizards", "CLE": "Cleveland Cavaliers", "LAC": "Los Angeles Clippers",
 "NYK": "New York Knicks", "BOS": "Boston Celtics", "NJN": "New Jersey Nets",
 "MLH": "Milwaukee Hawks", "STL": "St. Louis Hawks", "TOT": "Multiple teams",
-"PHO": "Phoenix Suns", "HOU": "Houston Rockets", "POR": "Portland Trailblazers",
+"PHO": "Phoenix Suns", "HOU": "Houston Rockets", "POR": "Portland Trail Blazers",
 "SEA": "Seattle SuperSonics", "SAS": "San Antonio Spurs", "CHH": "Charlotte Hornets",
 "ATL": "Atlanta Hawks", "ORL": "Orlando Magic", "MIA": "Miami Heat", "CHI": "Chicago Bulls",
 "KCK": "Kansas City Kings", "SAC": "Sacramento Kings", "MNL": "Minneapolis Lakers",
@@ -97,7 +97,7 @@ function formatName(name) {
 
 function debugging1(bestplayers) {
   for(q = 0 ; q < bestplayers.length ; q++) {
-    if(bestplayers[q].name.replace("*", "") == "Chris Paul") {
+    if(bestplayers[q].name.replace("*", "") == "Clyde Drexler") {
       console.log(bestplayers[q].name);
       for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
         console.log(bestplayers[q].seasons[e].year);
@@ -287,7 +287,7 @@ d3.csv("seasonstats.csv", function(data) {
     return x < y ? -1 : x > y ? 1 : 0;
 });
 
-  // debugging1(bestplayers);
+  debugging1(bestplayers);
   // debugging2();
 
   var select1 = d3.select('body')
@@ -711,7 +711,7 @@ d3.csv("seasonstats.csv", function(data) {
             var index = d.team.length;
             var playerName = getPlayerName(this.id);
             var info = "<font color='white'>" + "Player: " + playerName;
-            info += "Team: " + d.team[index - 1] + "<br/>";
+            info += "Team: " + teammap[d.team[index - 1]] + "<br/>";
             info += "Player Age: " + d.age + "<br/>" + "<br/>";
             info += "Did not make playoffs" + "</font>";
             div.transition()    
