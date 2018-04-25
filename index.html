@@ -649,7 +649,7 @@ d3.csv("seasonstats.csv", function(data) {
     var playerName = getPlayerName(id);
     var index = seasonObject.team.length;
     var info = "<font color='white'>" + "Player: " + playerName + "<br/>";
-    info += "Team: " + seasonObject.team[index - 1] + "<br/>";
+    info += "Team: " + teammap[seasonObject.team[index - 1]] + "<br/>";
     info += "Player Age: " + seasonObject.age + "<br/>";
     info += "Series: " + seasonObject.playoffs[1] + " - " + seasonObject.playoffs[3] + 
     ", " + seasonObject.playoffs[2] + " - " + seasonObject.playoffs[4] + "</font>";
