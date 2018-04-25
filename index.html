@@ -18,10 +18,16 @@ div.tooltip {
     pointer-events: none;     
 }
 
+img {
+    position: absolute;
+    top: 0px;
+    right: -50;
+}
+
     </style>
   </head>
 <body>
-<img src="logo.png" alt="logo" width="500" height="150">
+<img src="logo.png" alt="logo" width="500" height="150" class>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
       
@@ -203,7 +209,7 @@ var svg = d3.select("body").append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  .attr("transform", "translate(" + margin.left + "," + 220 + ")");
 
 d3.csv("playoffs.csv", function(data) {
   data.forEach(function(d) {
@@ -289,7 +295,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'one')
     .style('position', 'absolute')
-    .style('top', '205px')
+    .style('top', '215px')
     .style('left', '20px')
     .on('change',onchange1)
 
@@ -304,7 +310,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'two')
     .style('position', 'absolute')
-    .style('top', '235px')
+    .style('top', '245px')
     .style('left', '20px')
     .on('change',onchange2);
 
@@ -328,7 +334,8 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("width", 175)
     .attr("height", 100)       // set the x corner curve radius
     .attr("ry", 10)
-    .style("fill", "CornflowerBlue");
+    .style("fill", "CornflowerBlue")
+    .style('position', 'absolute');
 
   svg.append("text")             
     .attr("transform",
@@ -356,7 +363,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("height", 240)
     .attr("width", 400)
     .attr("x", 100)
-    .attr("y", 0);
+    .attr("y", 170);
 
   svg.append("text")             
     .attr("transform",
@@ -378,7 +385,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("height", 240)
     .attr("width", 400)
     .attr("x", 340)
-    .attr("y", 0);
+    .attr("y", 170);
 
   svg.append("text")             
     .attr("transform",
@@ -858,47 +865,47 @@ d3.csv("seasonstats.csv", function(data) {
 
   function drawLegend(player1, player2) {
     svg.append("line")
-      .attr("x1", 650) //-40
+      .attr("x1", -40)
       .attr("y1", 180)
-      .attr("x2", 650) //-40
+      .attr("x2", -40)
       .attr("y2", 260)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
-      .attr("x1", 815)
+      .attr("x1", 125)
       .attr("y1", 180)
-      .attr("x2", 815)
+      .attr("x2", 125)
       .attr("y2", 260)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
-      .attr("x1", 650)
-      .attr("y1", 180)
-      .attr("x2", 815)
-      .attr("y2", 180)
+      .attr("x1", -40)
+      .attr("y1", 181)
+      .attr("x2", 125)
+      .attr("y2", 181)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
-      .attr("x1", 650)
-      .attr("y1", 259)
-      .attr("x2", 815)
-      .attr("y2", 259)
+      .attr("x1", -40)
+      .attr("y1", 260)
+      .attr("x2", 125)
+      .attr("y2", 260)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
-      .attr("x1", 660)
+      .attr("x1", -30)
       .attr("y1", 207)
-      .attr("x2", 686)
+      .attr("x2", -4)
       .attr("y2", 207)
       .attr("stroke-width", 5)
       .attr("stroke", "blue");
 
     svg.append("line")
-      .attr("x1", 660)
+      .attr("x1", -30)
       .attr("y1", 235)
-      .attr("x2", 686)
+      .attr("x2", -4)
       .attr("y2", 235)
       .attr("stroke-width", 5)
       .attr("stroke", "red");
@@ -906,7 +913,7 @@ d3.csv("seasonstats.csv", function(data) {
     svg.append("text")   
       .attr("id", "legendone")          
       .attr("transform",
-          "translate(735, 210)")
+          "translate(55, 210)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player1)
@@ -930,7 +937,7 @@ d3.csv("seasonstats.csv", function(data) {
     svg.append("text")  
       .attr("id", "legendtwo")          
       .attr("transform",
-          "translate(735, 238)")
+          "translate(55, 238)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player2)
@@ -953,9 +960,9 @@ d3.csv("seasonstats.csv", function(data) {
 
     svg.append("text")            
       .attr("transform",
-          "translate(730, 170)")
+          "translate(40, 170)")
       .style("text-anchor", "middle")
-      .style("font-size", "14px")
+      .style("font-size", "15px")
       .text("Legend")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .attr("fill", "black");
