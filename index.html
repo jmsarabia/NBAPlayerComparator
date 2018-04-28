@@ -52,7 +52,7 @@ var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers",
 "BRK": "Brooklyn Nets", "MIN": "Minnesota Timberwolves", "CIN": "Cincinnati Royals",
 "SDC": "San Diego Clippers", "CHP": "Chicago Packers", "CHZ": "Chicago Zephyrs",
 "NOJ": "New Orleans Jazz", "PHW": "Philadelphia Warriors", "OKC": "Oklahoma City Thunder",
-"NOK": "New Orleans Hornets", "NOH": "New Orleans Hornets"};
+"NOK": "New Orleans Hornets", "NOH": "New Orleans Hornets", "SFW": "San Francisco Warriors"};
 
 var moreplayers = ["Kevin Durant", "James Harden", "Stephen Curry", "Russell Westbrook", 
 "Chris Paul", "Chris Webber", "Chris Bosh", "Dwight Howard", "Isiah Thomas",
@@ -658,7 +658,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   function getPixels(id) {
     if(id.includes("one")) {
-      return (d3.event.pageX - 220) + "px"; 
+      return (d3.event.pageX + 20) + "px";  //change back later
     } else {
       return (d3.event.pageX + 20) + "px";
     }
