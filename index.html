@@ -790,12 +790,32 @@ d3.csv("seasonstats.csv", function(data) {
 
     svg.append("text")             
       .attr("transform",
-          "translate(1180, 0)")
+          "translate(1200, -100)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "10px")
       .style("font-weight", "bold")
       .text("*Hover your mouse over any")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(1200, -90)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("circle to see the Playoff")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(1200, -80)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("results for that series")
       .attr("fill", "black");
 
   setupIndividual();
