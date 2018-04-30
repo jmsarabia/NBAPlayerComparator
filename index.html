@@ -197,8 +197,8 @@ function getTeamName(team) {
 
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
-width = 960 - margin.left - margin.right,
-height = 1400 - margin.top - margin.bottom;
+width = 1400 - margin.left - margin.right,
+height = 960 - margin.top - margin.bottom;
 
 var div = d3.select("body").append("div") 
     .attr("class", "tooltip")       
@@ -558,10 +558,10 @@ d3.csv("seasonstats.csv", function(data) {
   var playoffLabels = ['Champion', 'Finals', 
   'Conference Finals', 'Conference Semifinals', '1st Round', 'No Playoffs'];
 
-  var yearLabels = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6',
-  'Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'Year 13',
-  'Year 14', 'Year 15', 'Year 16', 'Year 17', 'Year 18', 'Year 19', 'Year 20',
-  'Year 21', 'Year 22', 'Year 23', 'Year 24', 'Year 25'];
+  var yearLabels = ['Yr 1', 'Yr 2', 'Yr 3', 'Yr 4', 'Yr 5', 'Yr 6',
+  'Yr 7', 'Yr 8', 'Yr 9', 'Yr 10', 'Yr 11', 'Yr 12', 'Yr 13',
+  'Yr 14', 'Yr 15', 'Yr 16', 'Yr 17', 'Yr 18', 'Yr 19', 'Yr 20',
+  'Yr 21', 'Yr 22', 'Yr 23', 'Yr 24', 'Yr 25'];
 
   var xScale1 = d3.scaleOrdinal()
     .domain(labels)
@@ -571,7 +571,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
       .attr("transform",
-          "translate(350, 680)")
+          "translate(1020, -100)")
       .style("text-anchor", "middle")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "20px")
@@ -588,16 +588,16 @@ d3.csv("seasonstats.csv", function(data) {
 
         var xScale2 = d3.scaleBand()
           .domain(slicedArr)
-          .range([0, width - 200]);
+          .range([0, (width - 570) - 200]);
 
         var xScale3 = d3.scaleLinear()
           .domain([0, slicedArr.length])
-          .range([0, width - 200]);
+          .range([0, (width - 570) - 200]);
 
       svg.append("g")
         .attr("class", "x axis")
         .attr("id", "overview")
-        .attr("transform", "translate(60, 1050)")
+        .attr("transform", "translate(782, 240)")
         .call(d3.axisBottom(xScale2));
 
       } else {
@@ -606,16 +606,16 @@ d3.csv("seasonstats.csv", function(data) {
 
         var xScale2 = d3.scaleBand()
           .domain(slicedArr)
-          .range([0, width - 200]);
+          .range([0, (width - 570) - 200]);
 
         var xScale3 = d3.scaleLinear()
           .domain([0, slicedArr.length])
-          .range([0, width - 200]); 
+          .range([0, (width - 570) - 200]); 
 
         svg.append("g")
         .attr("class", "x axis")
         .attr("id", "overview")
-        .attr("transform", "translate(60, 1050)")
+        .attr("transform", "translate(782, 240)")
         .call(d3.axisBottom(xScale2));
 
       }
@@ -628,7 +628,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("g")
     .attr("class", "y axis")
-    .attr("transform", "translate(60, 750)")
+    .attr("transform", "translate(782, -60)")
     .call(d3.axisLeft(yScalePlayoffs));
 
   createOverview(index3, "blue", "one", xScale3);
@@ -682,7 +682,7 @@ d3.csv("seasonstats.csv", function(data) {
       .datum(bestplayers[index].seasons)
       .attr("id", which)
       .attr("class", "line")
-      .attr("transform", "translate(81, 750)")
+      .attr("transform", "translate(800, -60)")
       .attr("d", line)
       .attr("stroke", color)
       .attr("stroke-width", 2)
@@ -695,7 +695,7 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("class", "dot")
       .attr("cx", function(d, i) { return xScale3(i); })
       .attr("cy", function(d) { return getOverviewPos(d); })
-      .attr("transform", "translate(81, 750)")
+      .attr("transform", "translate(800, -60)")
       .attr("fill", color)
       .attr("r", 5)
       .on("mouseover", function(d) {  
@@ -929,9 +929,10 @@ d3.csv("seasonstats.csv", function(data) {
       .on("mouseout", function() {
         for(a = 0 ; a < 600 ; a++) {
           for(r = 0 ; r < 20 ; r++) {
-            d3.select('#line' + a + "_" + r + "two").style("opacity", function(d) { return opacityScale(r); });
+            d3.select('#line' + a + "_" + r + "two").style("opacity", function(d) { 
+              return opacityScale(r); });
           }
-        }
+        }      
       });
 
     svg.append("text")  
