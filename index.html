@@ -667,9 +667,9 @@ d3.csv("seasonstats.csv", function(data) {
 
   function getPixels(id) {
     if(id.includes("one")) {
-      return (d3.event.pageX + 20) + "px";  //change back later
+      return (d3.event.pageX - 220) + "px";  //change back later
     } else {
-      return (d3.event.pageX + 20) + "px";
+      return (d3.event.pageX - 220) + "px";
     }
   }
 
