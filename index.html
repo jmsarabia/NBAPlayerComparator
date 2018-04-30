@@ -27,7 +27,7 @@ img {
     </style>
   </head>
 <body>
-<img src="logo.png" alt="logo" width="500" height="150" class>
+<img src="logo.png" alt="logo" width="430" height="70" class>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
       
@@ -208,7 +208,7 @@ var svg = d3.select("body").append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
-  .attr("transform", "translate(" + margin.left + "," + 220 + ")");
+  .attr("transform", "translate(" + margin.left + "," + 120 + ")");
 
 d3.csv("playoffs.csv", function(data) {
   data.forEach(function(d) {
@@ -294,7 +294,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'one')
     .style('position', 'absolute')
-    .style('top', '215px')
+    .style('top', '115px')
     .style('left', '20px')
     .on('change',onchange1)
 
@@ -309,7 +309,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'two')
     .style('position', 'absolute')
-    .style('top', '245px')
+    .style('top', '145px')
     .style('left', '20px')
     .on('change',onchange2);
 
@@ -347,7 +347,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
     .attr("transform",
-          "translate(350, 265)")
+          "translate(350, 240)")
     .style("text-anchor", "middle")
     .style("font-size", "20px")
     .text("Average Stats for Each Season")
@@ -359,14 +359,14 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#one').property('value')))
     .attr("class", "pico")
     .attr("id", "pic_one")
-    .attr("height", 240)
-    .attr("width", 400)
-    .attr("x", 100)
-    .attr("y", 170);
+    .attr("height", 215)
+    .attr("width", 358.33)
+    .attr("x", 105)
+    .attr("y", 70);
 
   svg.append("text")             
     .attr("transform",
-        "translate(250, 210)")
+        "translate(235, 185)")
     .attr("id", "text_one")
     .style("text-anchor", "middle")
     .style("font-family", "Helvetica, Arial, Sans-Serif")
@@ -381,14 +381,14 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#two').property('value')))
     .attr("class", "pico")
     .attr("id", "pic_two")
-    .attr("height", 240)
-    .attr("width", 400)
+    .attr("height", 215)
+    .attr("width", 358.33)
     .attr("x", 340)
-    .attr("y", 170);
+    .attr("y", 70);
 
   svg.append("text")             
     .attr("transform",
-        "translate(480, 210)")
+        "translate(465, 185)")
     .attr("id", "text_two")
     .style("text-anchor", "middle")
     .style("font-family", "Helvetica, Arial, Sans-Serif")
@@ -510,32 +510,32 @@ d3.csv("seasonstats.csv", function(data) {
   var minPL = getMinPL(bestplayers[index3].seasons, bestplayers[index4].seasons);
 
   function getPPGScale(maxPPG) {
-    var ppgScale = d3.scaleLinear().domain([0,maxPPG + 5]).range([570,300]);
+    var ppgScale = d3.scaleLinear().domain([0,maxPPG + 5]).range([530,260]);
     return ppgScale;
   }
 
   function getAPGScale(maxAPG) {
-    var apgScale = d3.scaleLinear().domain([0,maxAPG + 5]).range([570,300]);
+    var apgScale = d3.scaleLinear().domain([0,maxAPG + 5]).range([530,260]);
     return apgScale;
   }
 
   function getRPGScale(maxRPG) {
-    var rpgScale = d3.scaleLinear().domain([0,maxRPG + 5]).range([570,300]);
+    var rpgScale = d3.scaleLinear().domain([0,maxRPG + 5]).range([530,260]);
     return rpgScale;
   }
 
   function getBPGScale(maxBPG) {
-    var bpgScale = d3.scaleLinear().domain([0,maxBPG]).range([570,300]);
+    var bpgScale = d3.scaleLinear().domain([0,maxBPG]).range([530,260]);
     return bpgScale;
   }
 
   function getSPGScale(maxSPG) {
-    var spgScale = d3.scaleLinear().domain([0,maxSPG]).range([570,300]);
+    var spgScale = d3.scaleLinear().domain([0,maxSPG]).range([530,260]);
     return spgScale;
   }
 
   function getPlusMinusScale(maxPL, minPL) {
-    var plusminusScale = d3.scaleLinear().domain([minPL,maxPL]).range([570,300]);
+    var plusminusScale = d3.scaleLinear().domain([minPL,maxPL]).range([530,260]);
     return plusminusScale;
   }
 
@@ -570,7 +570,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
       .attr("transform",
-          "translate(1020, -100)")
+          "translate(1020, -90)")
       .style("text-anchor", "middle")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "20px")
@@ -998,8 +998,15 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(60, 585)")
+      .attr("transform", "translate(60, 530)")
       .call(d3.axisBottom(xScale1));
+
+  svg.selectAll(".tick")
+    .each(function (d) {
+        if ( d === 0 ) {
+            this.remove();
+        }
+    });
 
   var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale, opacityScale];
 
@@ -1071,54 +1078,54 @@ d3.csv("seasonstats.csv", function(data) {
   function drawLegend(player1, player2) {
     svg.append("line")
       .attr("x1", -40)
-      .attr("y1", 180)
+      .attr("y1", 160)
       .attr("x2", -40)
-      .attr("y2", 260)
+      .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
       .attr("x1", 125)
-      .attr("y1", 180)
+      .attr("y1", 160)
       .attr("x2", 125)
-      .attr("y2", 260)
+      .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
       .attr("x1", -40)
-      .attr("y1", 181)
+      .attr("y1", 161)
       .attr("x2", 125)
-      .attr("y2", 181)
+      .attr("y2", 161)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
       .attr("x1", -40)
-      .attr("y1", 260)
+      .attr("y1", 240)
       .attr("x2", 125)
-      .attr("y2", 260)
+      .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
       .attr("x1", -30)
-      .attr("y1", 207)
+      .attr("y1", 187)
       .attr("x2", -4)
-      .attr("y2", 207)
+      .attr("y2", 187)
       .attr("stroke-width", 5)
       .attr("stroke", "RoyalBlue");
 
     svg.append("line")
       .attr("x1", -30)
-      .attr("y1", 235)
+      .attr("y1", 215)
       .attr("x2", -4)
-      .attr("y2", 235)
+      .attr("y2", 215)
       .attr("stroke-width", 5)
       .attr("stroke", "Crimson");
 
     svg.append("text")   
       .attr("id", "legendone")          
       .attr("transform",
-          "translate(55, 210)")
+          "translate(55, 190)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player1)
@@ -1143,7 +1150,7 @@ d3.csv("seasonstats.csv", function(data) {
     svg.append("text")  
       .attr("id", "legendtwo")          
       .attr("transform",
-          "translate(55, 238)")
+          "translate(55, 218)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player2)
@@ -1166,7 +1173,7 @@ d3.csv("seasonstats.csv", function(data) {
 
     svg.append("text")            
       .attr("transform",
-          "translate(40, 170)")
+          "translate(40, 150)")
       .style("text-anchor", "middle")
       .style("font-size", "15px")
       .text("Legend")
