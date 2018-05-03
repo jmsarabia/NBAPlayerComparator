@@ -11,8 +11,7 @@ div.tooltip {
     width: 200px;          
     height: 80px;         
     padding: 4px;       
-    font: 12px sans-serif;    
-    background: cornflowerblue; 
+    font: 12px sans-serif;
     border: 0px;    
     border-radius: 8px;     
     pointer-events: none;     
@@ -35,6 +34,7 @@ img {
 
 var allplayers = [];
 var playoffsArr = [];
+var careerPL = [];
 
 var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers", 
 "LAL": "Los Angeles Lakers", "UTA": "Utah Jazz", "DET": "Detroit Pistons",
@@ -96,20 +96,20 @@ function formatName(name) {
 
 function debugging1(bestplayers) {
   for(q = 0 ; q < bestplayers.length ; q++) {
-    if(bestplayers[q].name.replace("*", "") == "Elgin Baylor") {
-      console.log(bestplayers[q].name);
-      for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
-        console.log(bestplayers[q].seasons[e].year);
-        console.log(bestplayers[q].seasons[e].playoffs);
-        if(bestplayers[q].seasons[e].team.length > 1) {
-          for(w = 0 ; w < bestplayers[q].seasons[e].team.length ; w++) {
-            console.log(bestplayers[q].seasons[e].team[w]);
-          }
-        } else {
-          console.log(bestplayers[q].seasons[e].team[0]);
-        }
-      }
-    }
+    console.log(bestplayers[q].name);
+    console.log(round(bestplayers[q].averages[5], 1));
+      // for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
+      //   console.log(bestplayers[])
+        // console.log(bestplayers[q].seasons[e].year);
+        // console.log(bestplayers[q].seasons[e].playoffs);
+        // if(bestplayers[q].seasons[e].team.length > 1) {
+        //   for(w = 0 ; w < bestplayers[q].seasons[e].team.length ; w++) {
+        //     console.log(bestplayers[q].seasons[e].team[w]);
+        //   }
+        // } else {
+        //   console.log(bestplayers[q].seasons[e].team[0]);
+        // }
+    // }
   // console.log("LENGTH: " + bestplayers.length);
   }
 }
@@ -194,6 +194,66 @@ function getTeamName(team) {
   return teammap[team];
 }
 
+function getCareerPL(playerName) {
+  for(s = 0 ; s < careerPL.length ; s++) {
+    if(careerPL[s].name == playerName) {
+      return careerPL[s].pl;
+    }
+  }
+}
+
+function round(value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
+}
+
+function setAverages(bestplayers) {
+  for(e = 0 ; e < bestplayers.length ; e++) {
+    var averagePoints = 0;
+    var averageAssists = 0;
+    var averageRebounds = 0;
+    var averageSteals = 0;
+    var averageBlocks = 0;
+    var averagePL = 0;
+    var games = 0;
+    for(q = 0 ; q < bestplayers[e].seasons.length ; q++) {
+      games += bestplayers[e].seasons[q].games;
+      averagePoints += bestplayers[e].seasons[q].points;
+      averageAssists += bestplayers[e].seasons[q].assists;
+      averageRebounds += bestplayers[e].seasons[q].rebounds;
+      averageSteals += bestplayers[e].seasons[q].steals;
+      averageBlocks += bestplayers[e].seasons[q].blocks;
+      // averagePL += bestplayers[e].seasons[q].plusminus;
+    }
+    averagePoints = averagePoints/games;
+    averageAssists = averageAssists/games;
+    averageRebounds = averageRebounds/games;
+    averageSteals = averageSteals/games;
+    averageBlocks = averageBlocks/games;
+    // averagePL = averagePL/bestplayers[e].seasons.length;
+
+    bestplayers[e].averages[0] = averagePoints;
+    bestplayers[e].averages[1] = averageAssists;
+    bestplayers[e].averages[2] = averageRebounds;
+    bestplayers[e].averages[3] = averageSteals;
+    bestplayers[e].averages[4] = averageBlocks;
+    bestplayers[e].averages[5] = getCareerPL(bestplayers[e].name);
+  }
+}
+
+function checkAverages() {
+  for(p = 0 ; p < bestplayers.length ; p++) {
+    if(bestplayers[p].name.replace("*", "") == "Michael Jordan") {
+      console.log("Career PPG: " + round(bestplayers[p].averages[0], 1));
+      console.log("Career APG: " + round(bestplayers[p].averages[1], 1));
+      console.log("Career RPG: " + round(bestplayers[p].averages[2], 1));
+      console.log("Career SPG: " + round(bestplayers[p].averages[3], 1));
+      console.log("Career BPG: " + round(bestplayers[p].averages[4], 1));
+      console.log("Career PL: " + round(bestplayers[p].averages[5], 1));
+    }
+  }
+}
+
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
 width = 1400 - margin.left - margin.right,
@@ -209,6 +269,17 @@ var svg = d3.select("body").append("svg")
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + 120 + ")");
+
+d3.csv("plusminus.csv", function(data) {
+  data.forEach(function(d) {
+
+    var playerName = d.Player;
+    var plusminus = +d.BPM;
+    var playerObj = {name: playerName, pl: plusminus};
+    careerPL.push(playerObj);
+
+  });
+});
 
 d3.csv("playoffs.csv", function(data) {
   data.forEach(function(d) {
@@ -248,7 +319,7 @@ d3.csv("seasonstats.csv", function(data) {
         fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
         playoffs: null};
 
-      var player = {name: d.Player, seasons: []};
+      var player = {name: d.Player, seasons: [], averages: []};
       player.seasons.push(season);
       
       allplayers.push(player);
@@ -279,12 +350,13 @@ d3.csv("seasonstats.csv", function(data) {
 
   bestplayers = getBestPlayers();
   setPlayoffs(bestplayers);
+  setAverages(bestplayers);
 
   bestplayers.sort(function(a,b) {
     var x = a.name.toLowerCase();
     var y = b.name.toLowerCase();
     return x < y ? -1 : x > y ? 1 : 0;
-});
+  });
 
   // debugging1(bestplayers);
   // debugging2();
@@ -665,6 +737,37 @@ d3.csv("seasonstats.csv", function(data) {
     return info;
   }
 
+  function getIndividualDivInfo(id, index) {
+    var playerName = bestplayers[index].name.replace("*", "");
+    if(id.includes("0") || id.includes("1")) {
+      var stat = round(bestplayers[index].averages[0], 2);
+      var statName = "Career Points Per Game: ";
+    }
+    if(id.includes("2") || id.includes("3")) {
+      var stat = round(bestplayers[index].averages[1], 2);
+      var statName = "Career Assists Per Game: ";
+    }
+    if(id.includes("4") || id.includes("5")) {
+      var stat = round(bestplayers[index].averages[2], 2);
+      var statName = "Career Rebounds Per Game: ";
+    }
+    if(id.includes("6") || id.includes("7")) {
+      var stat = round(bestplayers[index].averages[3], 2);
+      var statName = "Career Steals Per Game: ";
+    }
+    if(id.includes("8") || id.includes("9")) {
+      var stat = round(bestplayers[index].averages[4], 2);
+      var statName = "Career Blocks Per Game: ";
+    }
+    if(id.includes("10") || id.includes("11")) {
+      var stat = round(bestplayers[index].averages[5], 2);
+      var statName = "Career Plus/Minus Score: ";
+    }
+    var info = "<br/>" + "<font color='white' size='3'>" + "Player: " + playerName + "<br/>";
+    info += statName + stat + "<br/>" + "</font>";
+    return info;
+  }
+
   function getPixels(id) {
     if(id.includes("one")) {
       return (d3.event.pageX - 220) + "px";  //change back later
@@ -858,12 +961,12 @@ d3.csv("seasonstats.csv", function(data) {
     var spg2 = (bestplayers[index2].seasons[season2].steals/games2).toFixed(2);
     var pl2 = (bestplayers[index2].seasons[season2].plusminus).toFixed(2);
 
-    appendText(800, 435, ppg1, ppg2, 80, 0, 1);
-    appendText(980, 435, apg1, apg2, 70, 2, 3);
-    appendText(1140, 435, rpg1, rpg2, 70, 4, 5);
-    appendText(800, 535, spg1, spg2, 70, 6, 7);
-    appendText(980, 535, bpg1, bpg2, 70, 8, 9);
-    appendText(1140, 535, pl1, pl2, 70, 10, 11);
+    appendText(800, 435, ppg1, ppg2, 80, 0, 1, index1, index2);
+    appendText(980, 435, apg1, apg2, 70, 2, 3, index1, index2);
+    appendText(1140, 435, rpg1, rpg2, 70, 4, 5, index1, index2);
+    appendText(800, 535, spg1, spg2, 70, 6, 7, index1, index2);
+    appendText(980, 535, bpg1, bpg2, 70, 8, 9, index1, index2);
+    appendText(1140, 535, pl1, pl2, 70, 10, 11, index1, index2);
 
     svg.append("text")             
       .attr("transform",
@@ -898,7 +1001,7 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("stroke", "black");
   }
 
-  function appendText(moveX, moveY, stat1, stat2, offset, index1, index2) {
+  function appendText(moveX, moveY, stat1, stat2, offset, index1, index2, p1index, p2index) {
     var size1 = "21px";
     var size2 = "30px";
 
@@ -920,7 +1023,20 @@ d3.csv("seasonstats.csv", function(data) {
       .style("font-style", "italic")
       .text(stat1.toString())
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .attr("fill", "RoyalBlue");
+      .attr("fill", "RoyalBlue")
+      .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)
+                .style("background", "RoyalBlue");
+            div.html(getIndividualDivInfo(this.id, p1index))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") }) 
+      .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+      });
 
     svg.append("text")            
       .attr("transform",
@@ -931,7 +1047,20 @@ d3.csv("seasonstats.csv", function(data) {
       .style("font-style", "italic")
       .text(stat2.toString())
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .attr("fill", "Crimson");
+      .attr("fill", "Crimson")
+      .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)
+                .style("background", "Crimson");
+            div.html(getIndividualDivInfo(this.id, p2index))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") })
+      .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+      });
   }
 
   function createOverview(index, color, which, xScale, otherIndex) {
