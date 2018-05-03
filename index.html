@@ -9,7 +9,7 @@ div.tooltip {
     position: absolute;     
     text-align: center;     
     width: 200px;          
-    height: 80px;         
+    height: 100px;         
     padding: 4px;       
     font: 12px sans-serif;
     border: 0px;    
@@ -729,9 +729,10 @@ d3.csv("seasonstats.csv", function(data) {
   function getDivInfo(seasonObject, id) {
     var playerName = getPlayerName(id);
     var index = seasonObject.team.length;
-    var info = "<font color='white'>" + "Player: " + playerName + "<br/>";
+    var info = "<font color='white' size='2.75'>" + "Player: " + playerName + "<br/>";
     info += "Team: " + teammap[seasonObject.team[index - 1]] + "<br/>";
     info += "Player Age: " + seasonObject.age + "<br/>";
+    info += "Year: " + seasonObject.year + "<br/>";
     info += "Series: " + seasonObject.playoffs[1] + " - " + seasonObject.playoffs[3] + 
     ", " + seasonObject.playoffs[2] + " - " + seasonObject.playoffs[4] + "</font>";
     return info;
@@ -749,7 +750,7 @@ d3.csv("seasonstats.csv", function(data) {
     }
     if(id.includes("4") || id.includes("5")) {
       var stat = round(bestplayers[index].averages[2], 2);
-      var statName = "Career Rebounds Per Game: ";
+      var statName = "Career Rebounds Per G: ";
     }
     if(id.includes("6") || id.includes("7")) {
       var stat = round(bestplayers[index].averages[3], 2);
@@ -764,7 +765,7 @@ d3.csv("seasonstats.csv", function(data) {
       var statName = "Career Plus/Minus Score: ";
     }
     var info = "<font color='white' size='3'>" + "Player: " + playerName + "</font>" + "<br/>";
-    info += "<font color='white' size='3'> " + statName + "</font> "+ "<font color='white' size='6.5'>" + stat + "<br/>" + "</font>";
+    info += "<font color='white' size='3'> " + statName + "</font> "+ "<font color='white' size='7.5'>" + stat + "<br/>" + "</font>";
     return info;
   }
 
