@@ -1450,6 +1450,13 @@ d3.csv("seasonstats.csv", function(data) {
     createOverview(index2, "Crimson", "two", xScale3, index1);
 
     createIndividual(index1, index2, 0);
+
+    svg.selectAll(".tick")
+    .each(function (d) {
+        if ( d === 0 ) {
+            this.remove();
+        }
+    });
   };
 
   function onchange2() {
@@ -1520,6 +1527,13 @@ d3.csv("seasonstats.csv", function(data) {
     createOverview(index2, "Crimson", "two", xScale3, index1);
 
     createIndividual(index1, index2, 0);
+
+    svg.selectAll(".tick")
+    .each(function (d) {
+        if ( d === 0 ) {
+            this.remove();
+        }
+    });
   };
 
   function drawAxes(scales) {
