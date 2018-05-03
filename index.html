@@ -862,6 +862,16 @@ d3.csv("seasonstats.csv", function(data) {
       .text("Click any of the cirlces on the Playoff Results chart to update the chart below!")
       .attr("fill", "black");
 
+  svg.append("text")             
+      .attr("transform",
+          "translate(750, 575)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .text("*Hover your mouse over any of the numbers above to see the Career Average stats of the players!")
+      .attr("fill", "black");
+
     svg.append("text")             
       .attr("transform",
           "translate(780, 288)")
