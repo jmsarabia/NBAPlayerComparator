@@ -763,8 +763,8 @@ d3.csv("seasonstats.csv", function(data) {
       var stat = round(bestplayers[index].averages[5], 2);
       var statName = "Career Plus/Minus Score: ";
     }
-    var info = "<br/>" + "<font color='white' size='3'>" + "Player: " + playerName + "<br/>";
-    info += statName + stat + "<br/>" + "</font>";
+    var info = "<font color='white' size='3'>" + "Player: " + playerName + "</font>" + "<br/>";
+    info += "<font color='white' size='3'> " + statName + "</font> "+ "<font color='white' size='6.5'>" + stat + "<br/>" + "</font>";
     return info;
   }
 
