@@ -1414,12 +1414,24 @@ d3.csv("seasonstats.csv", function(data) {
   }
 
   function createPercentages(index1, index2, season) {
-    var fg1 = round(bestplayers[index1].seasons[season].fieldgoalpercent * 100, 2);
-    var fg2 = round(bestplayers[index2].seasons[season].fieldgoalpercent * 100, 2);
-    var three1 = round(bestplayers[index1].seasons[season].threepointerpercent * 100, 2);
-    var three2 = round(bestplayers[index2].seasons[season].threepointerpercent * 100, 2);
-    var ft1 = round(bestplayers[index1].seasons[season].freethrowpercent * 100, 2);
-    var ft2 = round(bestplayers[index2].seasons[season].freethrowpercent * 100, 2);
+    var season = parseInt(season, 10);
+    var season1 = season;
+    var season2 = season;
+
+    if(bestplayers[index1].seasons.length < (season + 1)) {
+      season1 = bestplayers[index1].seasons.length - 1;
+    }
+
+    if(bestplayers[index2].seasons.length < (season + 1)) {
+      season2 = bestplayers[index2].seasons.length - 1;
+    }
+
+    var fg1 = round(bestplayers[index1].seasons[season1].fieldgoalpercent * 100, 2);
+    var fg2 = round(bestplayers[index2].seasons[season2].fieldgoalpercent * 100, 2);
+    var three1 = round(bestplayers[index1].seasons[season1].threepointerpercent * 100, 2);
+    var three2 = round(bestplayers[index2].seasons[season2].threepointerpercent * 100, 2);
+    var ft1 = round(bestplayers[index1].seasons[season1].freethrowpercent * 100, 2);
+    var ft2 = round(bestplayers[index2].seasons[season2].freethrowpercent * 100, 2);
 
     if(fg1 < fg2) {
       var offset1 = 730;
