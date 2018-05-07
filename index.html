@@ -1162,7 +1162,8 @@ d3.csv("seasonstats.csv", function(data) {
             var playerName = getPlayerName(this.id);
             var info = "<font color='white'>" + "Player: " + playerName + "<br/>";
             info += "Team: " + teammap[d.team[index - 1]] + "<br/>";
-            info += "Player Age: " + d.age + "<br/>" + "<br/>";
+            info += "Player Age: " + d.age + "<br/>";
+            info += "Year: " + d.year + "<br/>" + "<br/>";
             info += "Did not make playoffs" + "</font>";
             div.transition()    
                 .duration(400)    
