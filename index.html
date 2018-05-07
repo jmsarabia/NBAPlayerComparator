@@ -1135,7 +1135,7 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("transform", "translate(800, -100)")
       .attr("fill", color)
       .attr("r", 5)
-      .on("mouseover", function(d) {  
+      .on("mouseover", function(d) {
         if(d.playoffs.length > 1) {  
             div.transition()    
                 .duration(400)    
@@ -1160,7 +1160,7 @@ d3.csv("seasonstats.csv", function(data) {
                 .style("background", getColor(this.id));  
             }
         })     
-        .on("mouseout", function(d) {   
+        .on("mouseout", function(d) {  
             div.transition()    
                 .duration(600)    
                 .style("opacity", 0);
@@ -1169,15 +1169,29 @@ d3.csv("seasonstats.csv", function(data) {
             for(w = 0 ; w < 12 ; w++) {
                 d3.select('#individuals_' + w).remove();
             }
+            for(r = 0 ; r < 3 ; r++) {
+                d3.select('#individualTextRed_' + r).remove();
+                d3.select('#individualTextBlue_' + r).remove();
+                d3.select('#individualRed_' + r).remove();
+                d3.select('#individualBlue_' + r).remove();
+            }
             d3.select('#individualText').remove();
             var id = this.id.substr(this.id.length - 2).replace("_", "");
 
             if(which == "one") {
               createIndividual(index, otherIndex, id);
+              createPercentages(index, otherIndex, id);
             } else {
               createIndividual(otherIndex, index, id);
+              createPercentages(otherIndex, index, id);
             }
         });
+
+        if(color == "RoyalBlue") {
+          var circles = d3.selectAll("circle");
+
+          console.log(circles);
+        }
     }
 
     function getOverviewPos(seasonObj) {
