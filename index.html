@@ -613,7 +613,7 @@ d3.csv("seasonstats.csv", function(data) {
   }
 
   function getOpacityScale(numberseasons) {
-    var opacityScale = d3.scaleLinear().domain([0, numberseasons]).range([0, 1]);
+    var opacityScale = d3.scaleLinear().domain([0, numberseasons]).range([0.5, 1]);
     return opacityScale;
   }
 
