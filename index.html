@@ -257,7 +257,7 @@ function checkAverages() {
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
 width = 1400 - margin.left - margin.right,
-height = 960 - margin.top - margin.bottom;
+height = 700 - margin.top - margin.bottom;
 
 var div = d3.select("body").append("div") 
     .attr("class", "tooltip")       
@@ -317,7 +317,7 @@ d3.csv("seasonstats.csv", function(data) {
         plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
         age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
         fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-        playoffs: null};
+        freethrowpercent: +d.FTPERC, playoffs: null};
 
       var player = {name: d.Player, seasons: [], averages: []};
       player.seasons.push(season);
@@ -335,7 +335,7 @@ d3.csv("seasonstats.csv", function(data) {
           plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
           age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
           fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-          playoffs: null};
+          freethrowpercent: +d.FTPERC, playoffs: null};
 
           allplayers[index].seasons.push(season);
 
@@ -652,11 +652,38 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
       .attr("transform",
-          "translate(1010, 320)")
+          "translate(1010, 220)")
       .style("text-anchor", "middle")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "20px")
       .text("Average Stats for a Single Season")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(810, 440)")
+      .style("text-anchor", "middle")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "18px")
+      .text("Field-Goal Percentage")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(1035, 440)")
+      .style("text-anchor", "middle")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "18px")
+      .text("Free-Throw Percentage")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(1250, 440)")
+      .style("text-anchor", "middle")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "18px")
+      .text("Three-Point Percentage")
       .attr("fill", "black");
 
   xScale3 = setupOverview(index3, index4);
@@ -678,7 +705,7 @@ d3.csv("seasonstats.csv", function(data) {
       svg.append("g")
         .attr("class", "x axis")
         .attr("id", "overview")
-        .attr("transform", "translate(782, 240)")
+        .attr("transform", "translate(782, 140)")
         .call(d3.axisBottom(xScale2));
 
       } else {
@@ -696,7 +723,7 @@ d3.csv("seasonstats.csv", function(data) {
         svg.append("g")
         .attr("class", "x axis")
         .attr("id", "overview")
-        .attr("transform", "translate(782, 240)")
+        .attr("transform", "translate(782, 140)")
         .call(d3.axisBottom(xScale2));
 
       }
@@ -705,7 +732,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   var yScalePlayoffs = d3.scaleOrdinal()
     .domain(playoffLabels)
-    .range([0, 60, 120, 180, 240, 300]);
+    .range([0, 40, 80, 120, 160, 200]);
 
   svg.append("g")
     .attr("class", "y axis")
@@ -786,75 +813,81 @@ d3.csv("seasonstats.csv", function(data) {
   }
 
   function setupIndividual() {
-    drawDivider(750, 360, 1270, 360);
-    drawDivider(935, 360, 935, 550);
-    drawDivider(1105, 360, 1105, 550);
-    drawDivider(750, 390, 1270, 390);
-    drawDivider(750, 460, 1270, 460);
-    drawDivider(750, 490, 1270, 490);
-    drawDivider(750, 550, 1270, 550);
-    drawDivider(750, 360, 750, 550);
-    drawDivider(1270, 360, 1270, 550);
+    drawDivider(750, 250, 1270, 250, "black", 1, 1);
+    drawDivider(935, 250, 935, 380, "black", 1, 1);
+    drawDivider(1105, 250, 1105, 380, "black", 1, 1);
+    drawDivider(750, 270, 1270, 270, "black", 1, 1);
+    drawDivider(750, 315, 1270, 315, "black", 1, 1);
+    drawDivider(750, 335, 1270, 335, "black", 1, 1);
+    drawDivider(750, 380, 1270, 380, "black", 1, 1);
+    drawDivider(750, 250, 750, 380, "black", 1, 1);
+    drawDivider(1270, 250, 1270, 380, "black", 1, 1);
 
     svg.append("text")             
       .attr("transform",
-          "translate(765, 380)")
+          "translate(765, 265)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .style("font-size", "14px")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
       .text("Points Per Game (PPG)")
       .attr("fill", "black");
 
     svg.append("text")             
       .attr("transform",
-          "translate(765, 480)")
+          "translate(765, 330)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .style("font-size", "14px")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
       .text("Steals Per Game (SPG)")
       .attr("fill", "black");
 
     svg.append("text")             
       .attr("transform",
-          "translate(945, 380)")
+          "translate(945, 265)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .style("font-size", "14px")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
       .text("Assists Per Game (APG)")
       .attr("fill", "black");
 
     svg.append("text")             
       .attr("transform",
-          "translate(945, 480)")
+          "translate(945, 330)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .style("font-size", "14px")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
       .text("Blocks Per Game (BPG)")
       .attr("fill", "black");
 
     svg.append("text")             
       .attr("transform",
-          "translate(1110, 380)")
+          "translate(1110, 265)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .style("font-size", "12.5px")
+      .style("font-size", "11.5px")
+      .style("font-style", "italic")
       .text("Rebounds Per Game (RPG)")
       .attr("fill", "black");
 
     svg.append("text")             
       .attr("transform",
-          "translate(1120, 480)")
+          "translate(1120, 330)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
-      .style("font-size", "14px")
+      .style("font-size", "13px")
       .text("+/- Score for Season")
+      .style("font-style", "italic")
       .attr("fill", "black");
 
   }
 
   svg.append("text")             
       .attr("transform",
-          "translate(780, 275)")
+          "translate(780, 180)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "12px")
@@ -864,7 +897,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
       .attr("transform",
-          "translate(750, 575)")
+          "translate(750, 395)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "12px")
@@ -874,7 +907,7 @@ d3.csv("seasonstats.csv", function(data) {
 
     svg.append("text")             
       .attr("transform",
-          "translate(780, 288)")
+          "translate(780, 190)")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "10px")
@@ -972,16 +1005,16 @@ d3.csv("seasonstats.csv", function(data) {
     var spg2 = (bestplayers[index2].seasons[season2].steals/games2).toFixed(2);
     var pl2 = (bestplayers[index2].seasons[season2].plusminus).toFixed(2);
 
-    appendText(800, 435, ppg1, ppg2, 80, 0, 1, index1, index2);
-    appendText(980, 435, apg1, apg2, 70, 2, 3, index1, index2);
-    appendText(1140, 435, rpg1, rpg2, 70, 4, 5, index1, index2);
-    appendText(800, 535, spg1, spg2, 70, 6, 7, index1, index2);
-    appendText(980, 535, bpg1, bpg2, 70, 8, 9, index1, index2);
-    appendText(1140, 535, pl1, pl2, 70, 10, 11, index1, index2);
+    appendText(800, 305, ppg1, ppg2, 80, 0, 1, index1, index2);
+    appendText(980, 305, apg1, apg2, 70, 2, 3, index1, index2);
+    appendText(1140, 305, rpg1, rpg2, 70, 4, 5, index1, index2);
+    appendText(800, 370, spg1, spg2, 70, 6, 7, index1, index2);
+    appendText(980, 370, bpg1, bpg2, 70, 8, 9, index1, index2);
+    appendText(1140, 370, pl1, pl2, 70, 10, 11, index1, index2);
 
     svg.append("text")             
       .attr("transform",
-          "translate(750, 350)")
+          "translate(750, 245)")
       .attr("id", "individualText")
       .style("text-anchor", "start")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
@@ -1002,14 +1035,15 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("fill", "black");
   }
 
-  function drawDivider(x1, y1, x2, y2) {
+  function drawDivider(x1, y1, x2, y2, color, width, opacity) {
     svg.append("line")
       .attr("x1", x1)
       .attr("y1", y1)
       .attr("x2", x2)
       .attr("y2", y2)
-      .attr("stroke-width", 1)
-      .attr("stroke", "black");
+      .attr("stroke-width", width)
+      .attr("stroke", color)
+      .style("opacity", opacity);
   }
 
   function appendText(moveX, moveY, stat1, stat2, offset, index1, index2, p1index, p2index) {
@@ -1084,7 +1118,7 @@ d3.csv("seasonstats.csv", function(data) {
       .datum(bestplayers[index].seasons)
       .attr("id", which)
       .attr("class", "line")
-      .attr("transform", "translate(800, -60)")
+      .attr("transform", "translate(800, -100)")
       .attr("d", line)
       .attr("stroke", color)
       .attr("stroke-width", 2)
@@ -1098,7 +1132,7 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("class", "dot")
       .attr("cx", function(d, i) { return xScale3(i); })
       .attr("cy", function(d) { return getOverviewPos(d); })
-      .attr("transform", "translate(800, -60)")
+      .attr("transform", "translate(800, -100)")
       .attr("fill", color)
       .attr("r", 5)
       .on("mouseover", function(d) {  
@@ -1149,13 +1183,13 @@ d3.csv("seasonstats.csv", function(data) {
     function getOverviewPos(seasonObj) {
 
       if(seasonObj.playoffs == "No Playoffs") {
-        return 300;
-      }
-      if(seasonObj.playoffs[0].includes("First Round")) {
         return 240;
       }
+      if(seasonObj.playoffs[0].includes("First Round")) {
+        return 200;
+      }
       if(seasonObj.playoffs[0].includes("Semifinals")) {
-        return 180;
+        return 160;
       }
       if(seasonObj.playoffs[0].includes("Conf") && seasonObj.playoffs[0].includes("Finals")) {
         return 120;
@@ -1164,10 +1198,10 @@ d3.csv("seasonstats.csv", function(data) {
         return 120;
       }
       if(seasonObj.playoffs[0] == "Finals") {
-        return 60;
+        return 80;
       }
       if(seasonObj.playoffs[0] == "Champion") {
-        return 0;
+        return 40;
       }
     }
 
@@ -1209,15 +1243,8 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(60, 530)")
+      .attr("transform", "translate(60, 540)")
       .call(d3.axisBottom(xScale1));
-
-  svg.selectAll(".tick")
-    .each(function (d) {
-        if ( d === 0 ) {
-            this.remove();
-        }
-    });
 
   var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale, opacityScale];
 
@@ -1284,6 +1311,126 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("stroke-width", 1)
       .attr("stroke", color)
       .attr("opacity", function(d) { return opacityScale(r); });
+  }
+
+  createPercentages(index3, index4, 0);
+
+  function drawCircleStat(stat1, stat2, offset, result, which) {
+    if(result == false) {
+      svg.append("circle")
+        .attr("transform",
+          "translate(" + offset + ", 500)")
+        .attr("id", "individualBlue_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 40)
+        .attr("fill", "RoyalBlue");
+
+      svg.append("circle")
+        .attr("transform",
+          "translate(" + (offset + 95) + ", 490)")
+        .attr("id", "individualRed_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 55)
+        .attr("fill", "Crimson");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 30) + ", 538)")
+        .attr("id", "individualTextBlue_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "22px")
+        .text(stat1 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 125) + ", 530)")
+        .attr("id", "individualTextRed_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "30px")
+        .text(stat2 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+    } else {
+        svg.append("circle")
+        .attr("transform",
+          "translate(" + offset + ", 490)")
+        .attr("id", "individualBlue_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 55)
+        .attr("fill", "RoyalBlue");
+
+      svg.append("circle")
+        .attr("transform",
+          "translate(" + (offset + 95) + ", 500)")
+        .attr("id", "individualRed_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 40)
+        .attr("fill", "Crimson");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 30) + ", 530)")
+        .attr("id", "individualTextBlue_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "30px")
+        .text(stat1 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 125) + ", 538)")
+        .attr("id", "individualTextRed_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "22px")
+        .text(stat2 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+    }
+  }
+
+  function createPercentages(index1, index2, season) {
+    var fg1 = round(bestplayers[index1].seasons[season].fieldgoalpercent * 100, 2);
+    var fg2 = round(bestplayers[index2].seasons[season].fieldgoalpercent * 100, 2);
+    var three1 = round(bestplayers[index1].seasons[season].threepointerpercent * 100, 2);
+    var three2 = round(bestplayers[index2].seasons[season].threepointerpercent * 100, 2);
+    var ft1 = round(bestplayers[index1].seasons[season].freethrowpercent * 100, 2);
+    var ft2 = round(bestplayers[index2].seasons[season].freethrowpercent * 100, 2);
+
+    if(fg1 < fg2) {
+      var offset1 = 730;
+    } else {
+      var offset1 = 750;
+    }
+    
+    if(ft1 < ft2) {
+      var offset2 = 950;
+    } else {
+      var offset2 = 970;
+    }
+
+    if(three1 < three2) {
+      var offset3 = 1165;
+    } else {
+      var offset3 = 1185;
+    }
+    drawCircleStat(fg1, fg2, offset1, fg1 > fg2, 0);
+    drawCircleStat(ft1, ft2, offset2, ft1 > ft2, 1);
+    drawCircleStat(three1, three2, offset3, three1 > three2, 2);
+
+    drawDivider(925, 430, 925, 615, "DarkGrey", 2, 0.3);
+    drawDivider(1145, 430, 1145, 615, "DarkGrey", 2, 0.3);
+
   }
 
   function drawLegend(player1, player2) {
@@ -1426,7 +1573,14 @@ d3.csv("seasonstats.csv", function(data) {
     for(w = 0 ; w < 12 ; w++) {
       d3.select('#individuals_' + w).remove();
     }
-     d3.select('#individualText').remove();
+    d3.select('#individualText').remove();
+
+    for(r = 0 ; r < 3 ; r++) {
+      d3.select('#individualTextRed_' + r).remove();
+      d3.select('#individualTextBlue_' + r).remove();
+      d3.select('#individualRed_' + r).remove();
+      d3.select('#individualBlue_' + r).remove();
+    }
     
     var index1 = getIndex(selectValue, bestplayers);
     var index2 = getIndex(selectValueOther, bestplayers);
@@ -1462,12 +1616,7 @@ d3.csv("seasonstats.csv", function(data) {
 
     createIndividual(index1, index2, 0);
 
-    svg.selectAll(".tick")
-    .each(function (d) {
-        if ( d === 0 ) {
-            this.remove();
-        }
-    });
+    createPercentages(index1, index2, 0);
   };
 
   function onchange2() {
@@ -1505,7 +1654,14 @@ d3.csv("seasonstats.csv", function(data) {
     for(w = 0 ; w < 12 ; w++) {
       d3.select('#individuals_' + w).remove();
     }
-     d3.select('#individualText').remove();
+    d3.select('#individualText').remove();
+
+    for(r = 0 ; r < 3 ; r++) {
+      d3.select('#individualTextRed_' + r).remove();
+      d3.select('#individualTextBlue_' + r).remove();
+      d3.select('#individualRed_' + r).remove();
+      d3.select('#individualBlue_' + r).remove();
+    }
 
     var index2 = getIndex(selectValue, bestplayers);
     var index1 = getIndex(selectValueOther, bestplayers);
@@ -1539,12 +1695,7 @@ d3.csv("seasonstats.csv", function(data) {
 
     createIndividual(index1, index2, 0);
 
-    svg.selectAll(".tick")
-    .each(function (d) {
-        if ( d === 0 ) {
-            this.remove();
-        }
-    });
+    createPercentages(index1, index2, 0);
   };
 
   function drawAxes(scales) {
