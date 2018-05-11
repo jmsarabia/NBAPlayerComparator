@@ -342,9 +342,15 @@ d3.csv("seasonstats.csv", function(data) {
       } else {
 
         allplayers[index].seasons[yearIndex].team.push(d.Tm);
+<<<<<<< HEAD
 
       }
 
+=======
+
+      }
+
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
     }
   });
 
@@ -630,8 +636,11 @@ d3.csv("seasonstats.csv", function(data) {
   var playoffLabels = ['Champion', 'Finals', 
   'Conference Finals', 'Conference Semifinals', '1st Round', 'No Playoffs'];
 
+<<<<<<< HEAD
   var labelDef = {"PPG": "Points per game", "APG": "Assists per game", "RPG": "Rebounds per game", "BPG": "Blocks per game", "SPG": "Steals per game", "+/-": "Plus minus score"}
 
+=======
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
   var yearLabels = ['Yr 1', 'Yr 2', 'Yr 3', 'Yr 4', 'Yr 5', 'Yr 6',
   'Yr 7', 'Yr 8', 'Yr 9', 'Yr 10', 'Yr 11', 'Yr 12', 'Yr 13',
   'Yr 14', 'Yr 15', 'Yr 16', 'Yr 17', 'Yr 18', 'Yr 19', 'Yr 20',
@@ -768,7 +777,10 @@ d3.csv("seasonstats.csv", function(data) {
   }
 
   function getIndividualDivInfo(id, index) {
+<<<<<<< HEAD
     div.style("width")
+=======
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
     var playerName = bestplayers[index].name.replace("*", "");
     if(id.includes("0") || id.includes("1")) {
       var stat = round(bestplayers[index].averages[0], 2);
@@ -799,9 +811,12 @@ d3.csv("seasonstats.csv", function(data) {
     return info;
   }
 
+<<<<<<< HEAD
   //TODO: tooltip for stat // +/- is 3 lines vs two lines for the other two 
 
 
+=======
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
   function getPixels(id) {
     if(id.includes("one")) {
       return (d3.event.pageX - 220) + "px";  //change back later
@@ -817,6 +832,7 @@ d3.csv("seasonstats.csv", function(data) {
       return "Crimson";
     }
   }
+<<<<<<< HEAD
 
   function setupIndividual() {
     drawDivider(750, 250, 1270, 250, "black", 1, 1);
@@ -859,6 +875,50 @@ d3.csv("seasonstats.csv", function(data) {
       .text("Assists Per Game (APG)")
       .attr("fill", "black");
 
+=======
+
+  function setupIndividual() {
+    drawDivider(750, 250, 1270, 250, "black", 1, 1);
+    drawDivider(935, 250, 935, 380, "black", 1, 1);
+    drawDivider(1105, 250, 1105, 380, "black", 1, 1);
+    drawDivider(750, 270, 1270, 270, "black", 1, 1);
+    drawDivider(750, 315, 1270, 315, "black", 1, 1);
+    drawDivider(750, 335, 1270, 335, "black", 1, 1);
+    drawDivider(750, 380, 1270, 380, "black", 1, 1);
+    drawDivider(750, 250, 750, 380, "black", 1, 1);
+    drawDivider(1270, 250, 1270, 380, "black", 1, 1);
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(765, 265)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
+      .text("Points Per Game (PPG)")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(765, 330)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
+      .text("Steals Per Game (SPG)")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(945, 265)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
+      .text("Assists Per Game (APG)")
+      .attr("fill", "black");
+
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
     svg.append("text")             
       .attr("transform",
           "translate(945, 330)")
@@ -891,11 +951,93 @@ d3.csv("seasonstats.csv", function(data) {
 
   }
 
+<<<<<<< HEAD
  
 
     
 
     
+=======
+  svg.append("text")             
+      .attr("transform",
+          "translate(780, 180)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .text("Click any of the cirlces on the Playoff Results chart to update the chart below!")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(750, 395)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .text("*Hover your mouse over any of the numbers above to see the Career Average stats of the players!")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(780, 190)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("*Notice below the Season changing when you click different circles")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(-50, 110)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("*Hover your mouse over either name")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(-50, 120)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("in the Legend to filter the other player")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(1200, -100)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("*Hover your mouse over any")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(1200, -90)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("circle to see the Playoff")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(1200, -80)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "10px")
+      .style("font-weight", "bold")
+      .text("results for that series")
+      .attr("fill", "black");
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
 
   setupIndividual();
 
@@ -991,8 +1133,11 @@ d3.csv("seasonstats.csv", function(data) {
       size2 = "21px";
     }
 
+<<<<<<< HEAD
     
 
+=======
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
     svg.append("text")            
       .attr("transform",
           "translate(" + moveX + ", " + moveY + ")")
@@ -1006,9 +1151,13 @@ d3.csv("seasonstats.csv", function(data) {
       .on("mouseover", function(d) {  
             div.transition()    
                 .duration(400)    
+<<<<<<< HEAD
                 .style("opacity", .9)        
                 .style("height", "90px")
                 .style("width", "200px")
+=======
+                .style("opacity", .9)
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
                 .style("background", "RoyalBlue");
             div.html(getIndividualDivInfo(this.id, p1index))
                 .style("left", (d3.event.pageX - 230) + "px")  
@@ -1033,8 +1182,11 @@ d3.csv("seasonstats.csv", function(data) {
             div.transition()    
                 .duration(400)    
                 .style("opacity", .9)
+<<<<<<< HEAD
                 .style("height", "90px")
                 .style("width", "200px")
+=======
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
                 .style("background", "Crimson");
             div.html(getIndividualDivInfo(this.id, p2index))
                 .style("left", (d3.event.pageX - 230) + "px")  
@@ -1090,8 +1242,11 @@ d3.csv("seasonstats.csv", function(data) {
         if(d.playoffs.length > 1) {  
             div.transition()    
                 .duration(400)    
+<<<<<<< HEAD
                 .style("height", "90px")
                 .style("width", "200px")
+=======
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
                 .style("opacity", .9); 
             div.html(getDivInfo(d, this.id))
                 .style("left", getPixels(this.id))   
@@ -1276,7 +1431,10 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("g")
       .attr("class", "x axis")
+<<<<<<< HEAD
       .attr("id", "statXAxis")
+=======
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
       .attr("transform", "translate(60, 540)")
       .call(d3.axisBottom(xScale1));
 
@@ -1571,12 +1729,25 @@ d3.csv("seasonstats.csv", function(data) {
     svg.append("line")
       .attr("x1", 125)
       .attr("y1", 160)
+<<<<<<< HEAD
+      .attr("x2", 125)
+      .attr("y2", 240)
+=======
       .attr("x2", 125)
       .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
       .attr("x1", -40)
+      .attr("y1", 161)
+      .attr("x2", 125)
+      .attr("y2", 161)
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
+      .attr("stroke-width", 3)
+      .attr("stroke", "black");
+    svg.append("line")
+      .attr("x1", -40)
+<<<<<<< HEAD
       .attr("y1", 161)
       .attr("x2", 125)
       .attr("y2", 161)
@@ -1587,6 +1758,10 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("x1", -40)
       .attr("y1", 240)
       .attr("x2", 125)
+=======
+      .attr("y1", 240)
+      .attr("x2", 125)
+>>>>>>> baba8cb10b4081b6ef886bd33b59987b77b748cd
       .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
