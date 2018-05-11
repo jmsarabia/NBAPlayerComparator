@@ -1181,7 +1181,7 @@ d3.csv("seasonstats.csv", function(data) {
         }
         definition = "<font color = 'white' size = '" + textSize+"'> " + definition + "</font>";
 
-        console.log(definition);
+        // console.log(definition);
         return definition;
       }
 
@@ -1256,9 +1256,9 @@ d3.csv("seasonstats.csv", function(data) {
   d3.select("#statXAxis")
     .selectAll(".tick")
     .on("mouseover", function(d){
-      console.log("The text is" + d);
+      // console.log("The text is" + d);
       var labelstext = labelDef[d];
-      console.log(labelstext);  
+      // console.log(labelstext);  
       div.transition()
         .duration(400)
         .style("opacity", .9)
