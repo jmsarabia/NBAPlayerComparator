@@ -4,10 +4,29 @@
     <meta charset="utf-8">
     <title>NBA Player Comparator</title>
     <style type="text/css">
+
+div.tooltip { 
+    position: absolute;     
+    text-align: center;     
+    width: 200px;          
+    height: 100px;         
+    padding: 4px;       
+    font: 12px sans-serif;
+    border: 0px;    
+    border-radius: 8px;     
+    pointer-events: none;     
+}
+
+img {
+    position: absolute;
+    top: 0px;
+    right: -50;
+}
+
     </style>
   </head>
 <body>
-<img src="logo.png" alt="logo" width="500" height="150">
+<img src="logo.png" alt="logo" width="430" height="70" class>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
       
@@ -15,15 +34,16 @@
 
 var allplayers = [];
 var playoffsArr = [];
+var careerPL = [];
 
 var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers", 
 "LAL": "Los Angeles Lakers", "UTA": "Utah Jazz", "DET": "Detroit Pistons",
-"DAL": "Dallas Mavericks", "MIL": "Milwaukee Bucks", "DEN": "Denver Nuggets",
+"DAL": "Dallas Mavericks", "MIL": "Milwaukee Bucks", "DEN": "Denver Nuggets", "DEV": "Denver Nuggets",
 "PHI": "Philadelphia 76ers", "MEM": "Memphis Grizzlies", "GSW": "Golden State Warriors", 
 "WAS": "Washington Wizards", "CLE": "Cleveland Cavaliers", "LAC": "Los Angeles Clippers",
 "NYK": "New York Knicks", "BOS": "Boston Celtics", "NJN": "New Jersey Nets",
 "MLH": "Milwaukee Hawks", "STL": "St. Louis Hawks", "TOT": "Multiple teams",
-"PHO": "Phoenix Suns", "HOU": "Houston Rockets", "POR": "Portland Trailblazers",
+"PHO": "Phoenix Suns", "HOU": "Houston Rockets", "POR": "Portland Trail Blazers",
 "SEA": "Seattle SuperSonics", "SAS": "San Antonio Spurs", "CHH": "Charlotte Hornets",
 "ATL": "Atlanta Hawks", "ORL": "Orlando Magic", "MIA": "Miami Heat", "CHI": "Chicago Bulls",
 "KCK": "Kansas City Kings", "SAC": "Sacramento Kings", "MNL": "Minneapolis Lakers",
@@ -31,12 +51,14 @@ var teammap = {"BUF": "Buffalo Braves", "IND": "Indiana Pacers",
 "WSB": "Washington Bullets", "TOR": "Toronto Raptors", "SYR": "Syracuse Nationals",
 "BRK": "Brooklyn Nets", "MIN": "Minnesota Timberwolves", "CIN": "Cincinnati Royals",
 "SDC": "San Diego Clippers", "CHP": "Chicago Packers", "CHZ": "Chicago Zephyrs",
-"NOJ": "New Orleans Jazz", "PHW": "Philadelphia Warriors"};
+"NOJ": "New Orleans Jazz", "PHW": "Philadelphia Warriors", "OKC": "Oklahoma City Thunder",
+"NOK": "New Orleans Hornets", "NOH": "New Orleans Hornets", "SFW": "San Francisco Warriors"};
 
 var moreplayers = ["Kevin Durant", "James Harden", "Stephen Curry", "Russell Westbrook", 
 "Chris Paul", "Chris Webber", "Chris Bosh", "Dwight Howard", "Isiah Thomas",
 "Jamal Crawford", "Jason Kidd", "Jason Terry", "Mike Bibby", "Rudy Gay",
-"Scottie Pippen", "Steve Nash", "Tony Parker", "Paul George"];
+"Scottie Pippen", "Steve Nash", "Tony Parker", "Paul George", "Bob Lanier",
+"Bob McAdoo", "Clifford Robinson", "Walter Davis", "Dale Ellis", "Eddie Johnson"];
 
 
 function alreadyExists(name) {
@@ -74,14 +96,20 @@ function formatName(name) {
 
 function debugging1(bestplayers) {
   for(q = 0 ; q < bestplayers.length ; q++) {
-    if(bestplayers[q].name.replace("*", "") == "Carmelo Anthony") {
-      console.log(bestplayers[q].name);
-      for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
-        console.log(bestplayers[q].seasons[e].year);
-        console.log(bestplayers[q].seasons[e].playoffs);
-        console.log(bestplayers[q].seasons[e].team);
-      }
-    }
+    console.log(bestplayers[q].name);
+    console.log(round(bestplayers[q].averages[5], 1));
+      // for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
+      //   console.log(bestplayers[])
+        // console.log(bestplayers[q].seasons[e].year);
+        // console.log(bestplayers[q].seasons[e].playoffs);
+        // if(bestplayers[q].seasons[e].team.length > 1) {
+        //   for(w = 0 ; w < bestplayers[q].seasons[e].team.length ; w++) {
+        //     console.log(bestplayers[q].seasons[e].team[w]);
+        //   }
+        // } else {
+        //   console.log(bestplayers[q].seasons[e].team[0]);
+        // }
+    // }
   // console.log("LENGTH: " + bestplayers.length);
   }
 }
@@ -101,6 +129,15 @@ function debugging2() {
   console.log("LENGTH: " + bestplayers.length);
 }
 
+function yearAdded(index, year) {
+  for(s = 0 ; s < allplayers[index].seasons.length ; s++) {
+    if(allplayers[index].seasons[s].year == year) {
+      return s;
+    }
+  }
+  return -1;
+}
+
 function getIndex(player, bestplayers) {
   for(g = 0 ; g < bestplayers.length ; g++) {
     if(bestplayers[g].name.replace("*", "") == player) {
@@ -118,40 +155,131 @@ function yearExists(year) {
   return -1;
 }
 
+function setPlayoffs(bestplayers) {
+  for(p = 0 ; p < bestplayers.length ; p++) {
+    for(y = 0 ; y < bestplayers[p].seasons.length ; y++) {
+      var numberteams = bestplayers[p].seasons[y].team.length;
+      if(numberteams == 1) {
+        var teamName = getTeamName(bestplayers[p].seasons[y].team[0]);
+      } else {
+        var teamName = getTeamName(bestplayers[p].seasons[y].team[numberteams - 1]);
+      }
+      var year = bestplayers[p].seasons[y].year;
+      var playoffsResult = checkPlayoffs(teamName, year);
+      bestplayers[p].seasons[y].playoffs = playoffsResult;
+    }
+  }
+}
+
 function checkPlayoffs(team, year) {
   var index = yearExists(year);
   if(index != -1) {
     resultsArray = playoffsArr[index].results;
     for(s = resultsArray.length - 1 ; s >= 0 ; s--) {
       if(resultsArray[s].winner.startsWith(team) && resultsArray[s].series == "Finals") {
-        return "Champion";
+        return ["Champion", resultsArray[s].winner, resultsArray[s].loser, resultsArray[s].gW, resultsArray[s].gL];
       }
       if(resultsArray[s].loser.startsWith(team) && resultsArray[s].series == "Finals") {
-        return "Finals";
+        return ["Finals", resultsArray[s].winner, resultsArray[s].loser, resultsArray[s].gW, resultsArray[s].gL];
       }
       if(resultsArray[s].loser.startsWith(team) && resultsArray[s].series != "Finals") {
-        return resultsArray[s].series;
+        return [resultsArray[s].series, resultsArray[s].winner, resultsArray[s].loser, resultsArray[s].gW, resultsArray[s].gL];
       }
     }
   }
-  return "No Playoffs";
+  return ["No Playoffs"];
 }
 
 function getTeamName(team) {
   return teammap[team];
 }
 
+function getCareerPL(playerName) {
+  for(s = 0 ; s < careerPL.length ; s++) {
+    if(careerPL[s].name == playerName) {
+      return careerPL[s].pl;
+    }
+  }
+}
+
+function round(value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
+}
+
+function setAverages(bestplayers) {
+  for(e = 0 ; e < bestplayers.length ; e++) {
+    var averagePoints = 0;
+    var averageAssists = 0;
+    var averageRebounds = 0;
+    var averageSteals = 0;
+    var averageBlocks = 0;
+    var averagePL = 0;
+    var games = 0;
+    for(q = 0 ; q < bestplayers[e].seasons.length ; q++) {
+      games += bestplayers[e].seasons[q].games;
+      averagePoints += bestplayers[e].seasons[q].points;
+      averageAssists += bestplayers[e].seasons[q].assists;
+      averageRebounds += bestplayers[e].seasons[q].rebounds;
+      averageSteals += bestplayers[e].seasons[q].steals;
+      averageBlocks += bestplayers[e].seasons[q].blocks;
+      // averagePL += bestplayers[e].seasons[q].plusminus;
+    }
+    averagePoints = averagePoints/games;
+    averageAssists = averageAssists/games;
+    averageRebounds = averageRebounds/games;
+    averageSteals = averageSteals/games;
+    averageBlocks = averageBlocks/games;
+    // averagePL = averagePL/bestplayers[e].seasons.length;
+
+    bestplayers[e].averages[0] = averagePoints;
+    bestplayers[e].averages[1] = averageAssists;
+    bestplayers[e].averages[2] = averageRebounds;
+    bestplayers[e].averages[3] = averageSteals;
+    bestplayers[e].averages[4] = averageBlocks;
+    bestplayers[e].averages[5] = getCareerPL(bestplayers[e].name);
+  }
+}
+
+function checkAverages() {
+  for(p = 0 ; p < bestplayers.length ; p++) {
+    if(bestplayers[p].name.replace("*", "") == "Michael Jordan") {
+      console.log("Career PPG: " + round(bestplayers[p].averages[0], 1));
+      console.log("Career APG: " + round(bestplayers[p].averages[1], 1));
+      console.log("Career RPG: " + round(bestplayers[p].averages[2], 1));
+      console.log("Career SPG: " + round(bestplayers[p].averages[3], 1));
+      console.log("Career BPG: " + round(bestplayers[p].averages[4], 1));
+      console.log("Career PL: " + round(bestplayers[p].averages[5], 1));
+    }
+  }
+}
+
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
-width = 960 - margin.left - margin.right,
-height = 1400 - margin.top - margin.bottom;
+width = 1400 - margin.left - margin.right,
+height = 700 - margin.top - margin.bottom;
+
+var div = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);
 
 //adding svg to page
 var svg = d3.select("body").append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  .attr("transform", "translate(" + margin.left + "," + 120 + ")");
+
+d3.csv("plusminus.csv", function(data) {
+  data.forEach(function(d) {
+
+    var playerName = d.Player;
+    var plusminus = +d.BPM;
+    var playerObj = {name: playerName, pl: plusminus};
+    careerPL.push(playerObj);
+
+  });
+});
 
 d3.csv("playoffs.csv", function(data) {
   data.forEach(function(d) {
@@ -161,15 +289,14 @@ d3.csv("playoffs.csv", function(data) {
     if(d.Lg == "NBA" && !d.Series.includes("Tiebreak")) {
 
       if(index == -1) {
-
         var playoffRound = {playoffYear: year, results: []};
-        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW}
+        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW, gW: +d.GamesW, gL: +d.GamesL};
         playoffRound.results.push(result);
         playoffsArr.push(playoffRound);
 
       } else {
 
-        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW}
+        var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW, gW: +d.GamesW, gL: +d.GamesL};
         playoffsArr[index].results.push(result);
       }
     }
@@ -185,46 +312,53 @@ d3.csv("seasonstats.csv", function(data) {
 
     if(index == -1) {
 
-      var playoffsResult = checkPlayoffs(getTeamName(d.Tm), +d.Year);
-
       var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
         rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
-        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
+        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
         age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
         fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-        playoffs: playoffsResult};
+        freethrowpercent: +d.FTPERC, playoffs: null};
 
-      var player = {name: d.Player, seasons: []};
+      var player = {name: d.Player, seasons: [], averages: []};
       player.seasons.push(season);
       
       allplayers.push(player);
 
     } else {
 
-      var playoffsResult = checkPlayoffs(getTeamName(d.Tm), +d.Year);
+      var yearIndex = yearAdded(index, +d.Year);
 
-      var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
-        rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
-        plusminus: +d.BPM, games: +d.G, position: d.Pos, team: d.Tm,
-        age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
-        fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-        playoffs: playoffsResult};
+      if(yearIndex == -1) {
 
-      allplayers[index].seasons.push(season);
+        var season = {year: +d.Year, points: +d.PTS, assists: +d.AST,
+          rebounds: +d.TRB, steals: +d.STL, blocks: +d.BLK,
+          plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
+          age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
+          fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
+          freethrowpercent: +d.FTPERC, playoffs: null};
+
+          allplayers[index].seasons.push(season);
+
+      } else {
+
+        allplayers[index].seasons[yearIndex].team.push(d.Tm);
+
+      }
 
     }
-
   });
 
   bestplayers = getBestPlayers();
+  setPlayoffs(bestplayers);
+  setAverages(bestplayers);
 
   bestplayers.sort(function(a,b) {
     var x = a.name.toLowerCase();
     var y = b.name.toLowerCase();
     return x < y ? -1 : x > y ? 1 : 0;
-});
+  });
 
-  debugging1(bestplayers);
+  // debugging1(bestplayers);
   // debugging2();
 
   var select1 = d3.select('body')
@@ -232,7 +366,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'one')
     .style('position', 'absolute')
-    .style('top', '205px')
+    .style('top', '115px')
     .style('left', '20px')
     .on('change',onchange1)
 
@@ -247,7 +381,7 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'two')
     .style('position', 'absolute')
-    .style('top', '235px')
+    .style('top', '145px')
     .style('left', '20px')
     .on('change',onchange2);
 
@@ -271,29 +405,22 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("width", 175)
     .attr("height", 100)       // set the x corner curve radius
     .attr("ry", 10)
-    .style("fill", "CornflowerBlue");
-
-  // svg.append("rect")
-  //   .attr("x", -50)
-  //   .attr("y", -50)
-  //   .attr("width", 175)
-  //   .attr("height", 30)       // set the x corner curve radius
-  //   .attr("ry", 10)  
-  //   .style("fill", "DarkGrey")
-  //   .style("opacity", 1);
+    .style("fill", "DarkGrey")
+    .style('position', 'absolute');
 
   svg.append("text")             
     .attr("transform",
-          "translate(35, -22)")
+          "translate(36, -25)")
     .style("text-anchor", "middle")
-    .style("font-size", "19px")
+    .style("font-size", "18px")
     .text("Player Filter")
+    .style("font-style", "italic")
     .style("font-family", "Helvetica, Arial, Sans-Serif")
     .attr("fill", "white");
 
   svg.append("text")             
     .attr("transform",
-          "translate(300, 270)")
+          "translate(350, 240)")
     .style("text-anchor", "middle")
     .style("font-size", "20px")
     .text("Average Stats for Each Season")
@@ -305,14 +432,14 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#one').property('value')))
     .attr("class", "pico")
     .attr("id", "pic_one")
-    .attr("height", 240)
-    .attr("width", 400)
-    .attr("x", 100)
-    .attr("y", 0);
+    .attr("height", 215)
+    .attr("width", 358.33)
+    .attr("x", 105)
+    .attr("y", 70);
 
   svg.append("text")             
     .attr("transform",
-        "translate(250, 210)")
+        "translate(235, 185)")
     .attr("id", "text_one")
     .style("text-anchor", "middle")
     .style("font-family", "Helvetica, Arial, Sans-Serif")
@@ -327,14 +454,14 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("xlink:href", "playerpictures/" + formatName(d3.select('select#two').property('value')))
     .attr("class", "pico")
     .attr("id", "pic_two")
-    .attr("height", 240)
-    .attr("width", 400)
+    .attr("height", 215)
+    .attr("width", 358.33)
     .attr("x", 340)
-    .attr("y", 0);
+    .attr("y", 70);
 
   svg.append("text")             
     .attr("transform",
-        "translate(480, 210)")
+        "translate(465, 185)")
     .attr("id", "text_two")
     .style("text-anchor", "middle")
     .style("font-family", "Helvetica, Arial, Sans-Serif")
@@ -456,37 +583,37 @@ d3.csv("seasonstats.csv", function(data) {
   var minPL = getMinPL(bestplayers[index3].seasons, bestplayers[index4].seasons);
 
   function getPPGScale(maxPPG) {
-    var ppgScale = d3.scaleLinear().domain([0,maxPPG + 5]).range([570,300]);
+    var ppgScale = d3.scaleLinear().domain([0,maxPPG + 5]).range([530,260]);
     return ppgScale;
   }
 
   function getAPGScale(maxAPG) {
-    var apgScale = d3.scaleLinear().domain([0,maxAPG + 5]).range([570,300]);
+    var apgScale = d3.scaleLinear().domain([0,maxAPG + 5]).range([530,260]);
     return apgScale;
   }
 
   function getRPGScale(maxRPG) {
-    var rpgScale = d3.scaleLinear().domain([0,maxRPG + 5]).range([570,300]);
+    var rpgScale = d3.scaleLinear().domain([0,maxRPG + 5]).range([530,260]);
     return rpgScale;
   }
 
   function getBPGScale(maxBPG) {
-    var bpgScale = d3.scaleLinear().domain([0,maxBPG]).range([570,300]);
+    var bpgScale = d3.scaleLinear().domain([0,maxBPG]).range([530,260]);
     return bpgScale;
   }
 
   function getSPGScale(maxSPG) {
-    var spgScale = d3.scaleLinear().domain([0,maxSPG]).range([570,300]);
+    var spgScale = d3.scaleLinear().domain([0,maxSPG]).range([530,260]);
     return spgScale;
   }
 
   function getPlusMinusScale(maxPL, minPL) {
-    var plusminusScale = d3.scaleLinear().domain([minPL,maxPL]).range([570,300]);
+    var plusminusScale = d3.scaleLinear().domain([minPL,maxPL]).range([530,260]);
     return plusminusScale;
   }
 
   function getOpacityScale(numberseasons) {
-    var opacityScale = d3.scaleLinear().domain([0, numberseasons]).range([0, 1]);
+    var opacityScale = d3.scaleLinear().domain([0, numberseasons]).range([0.5, 1]);
     return opacityScale;
   }
 
@@ -494,7 +621,7 @@ d3.csv("seasonstats.csv", function(data) {
   apgScale = getAPGScale(maxAPG);
   rpgScale = getRPGScale(maxRPG);
   bpgScale = getBPGScale(maxBPG);
-  spgScale = getSPGScale(maxSPG)
+  spgScale = getSPGScale(maxSPG);
   plusminusScale = getPlusMinusScale(maxPL, minPL);
   opacityScale = getOpacityScale(bestplayers[index3].seasons.length);
 
@@ -503,10 +630,12 @@ d3.csv("seasonstats.csv", function(data) {
   var playoffLabels = ['Champion', 'Finals', 
   'Conference Finals', 'Conference Semifinals', '1st Round', 'No Playoffs'];
 
-  var yearLabels = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6',
-  'Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'Year 13',
-  'Year 14', 'Year 15', 'Year 16', 'Year 17', 'Year 18', 'Year 19', 'Year 20',
-  'Year 21', 'Year 22', 'Year 23', 'Year 24', 'Year 25'];
+  var labelDef = {"PPG": "Points per game", "APG": "Assists per game", "RPG": "Rebounds per game", "BPG": "Blocks per game", "SPG": "Steals per game", "+/-": "Plus minus score"}
+
+  var yearLabels = ['Yr 1', 'Yr 2', 'Yr 3', 'Yr 4', 'Yr 5', 'Yr 6',
+  'Yr 7', 'Yr 8', 'Yr 9', 'Yr 10', 'Yr 11', 'Yr 12', 'Yr 13',
+  'Yr 14', 'Yr 15', 'Yr 16', 'Yr 17', 'Yr 18', 'Yr 19', 'Yr 20',
+  'Yr 21', 'Yr 22', 'Yr 23', 'Yr 24', 'Yr 25'];
 
   var xScale1 = d3.scaleOrdinal()
     .domain(labels)
@@ -516,11 +645,47 @@ d3.csv("seasonstats.csv", function(data) {
 
   svg.append("text")             
       .attr("transform",
-          "translate(300, 680)")
+          "translate(1020, -90)")
       .style("text-anchor", "middle")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .style("font-size", "20px")
       .text("Playoff Results for Each Season")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(1010, 220)")
+      .style("text-anchor", "middle")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "20px")
+      .text("Average Stats for a Single Season")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(810, 440)")
+      .style("text-anchor", "middle")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "18px")
+      .text("Field-Goal Percentage")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(1035, 440)")
+      .style("text-anchor", "middle")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "18px")
+      .text("Free-Throw Percentage")
+      .attr("fill", "black");
+
+  svg.append("text")             
+      .attr("transform",
+          "translate(1250, 440)")
+      .style("text-anchor", "middle")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "18px")
+      .text("Three-Point Percentage")
       .attr("fill", "black");
 
   xScale3 = setupOverview(index3, index4);
@@ -533,16 +698,16 @@ d3.csv("seasonstats.csv", function(data) {
 
         var xScale2 = d3.scaleBand()
           .domain(slicedArr)
-          .range([0, width - 200]);
+          .range([0, (width - 570) - 200]);
 
         var xScale3 = d3.scaleLinear()
           .domain([0, slicedArr.length])
-          .range([0, width - 200]);
+          .range([0, (width - 570) - 200]);
 
       svg.append("g")
         .attr("class", "x axis")
         .attr("id", "overview")
-        .attr("transform", "translate(60, 1050)")
+        .attr("transform", "translate(782, 140)")
         .call(d3.axisBottom(xScale2));
 
       } else {
@@ -551,16 +716,16 @@ d3.csv("seasonstats.csv", function(data) {
 
         var xScale2 = d3.scaleBand()
           .domain(slicedArr)
-          .range([0, width - 200]);
+          .range([0, (width - 570) - 200]);
 
         var xScale3 = d3.scaleLinear()
           .domain([0, slicedArr.length])
-          .range([0, width - 200]); 
+          .range([0, (width - 570) - 200]); 
 
         svg.append("g")
         .attr("class", "x axis")
         .attr("id", "overview")
-        .attr("transform", "translate(60, 1050)")
+        .attr("transform", "translate(782, 140)")
         .call(d3.axisBottom(xScale2));
 
       }
@@ -569,17 +734,319 @@ d3.csv("seasonstats.csv", function(data) {
 
   var yScalePlayoffs = d3.scaleOrdinal()
     .domain(playoffLabels)
-    .range([0, 60, 120, 180, 240, 300]);
+    .range([0, 40, 80, 120, 160, 200]);
 
   svg.append("g")
     .attr("class", "y axis")
-    .attr("transform", "translate(60, 750)")
+    .attr("transform", "translate(782, -60)")
     .call(d3.axisLeft(yScalePlayoffs));
 
-  createOverview(index3, "blue", "one", xScale3);
-  createOverview(index4, "red", "two", xScale3);
+  createOverview(index3, "RoyalBlue", "one", xScale3, index4);
+  createOverview(index4, "Crimson", "two", xScale3, index3);
 
-  function createOverview(index, color, which, xScale) {
+  function getPlayerName(id) {
+    if(id.includes("one")) {
+      var playerNameInd = getIndex(d3.select('select#one').property('value'), bestplayers);
+      var playerName = bestplayers[playerNameInd].name.replace("*", "");
+    } else {
+      var playerNameInd = getIndex(d3.select('select#two').property('value'), bestplayers);
+      var playerName = bestplayers[playerNameInd].name.replace("*", "");
+    }
+    return playerName;
+  }
+
+  function getDivInfo(seasonObject, id) {
+    var playerName = getPlayerName(id);
+    var index = seasonObject.team.length;
+    var info = "<font color='white' size='2.75'>" + "Player: " + playerName + "<br/>";
+    info += "Team: " + teammap[seasonObject.team[index - 1]] + "<br/>";
+    info += "Player Age: " + seasonObject.age + "<br/>";
+    info += "Year: " + seasonObject.year + "<br/>";
+    info += "Series: " + seasonObject.playoffs[1] + " - " + seasonObject.playoffs[3] + 
+    ", " + seasonObject.playoffs[2] + " - " + seasonObject.playoffs[4] + "</font>";
+    return info;
+  }
+
+  function getIndividualDivInfo(id, index) {
+    div.style("width")
+    var playerName = bestplayers[index].name.replace("*", "");
+    if(id.includes("0") || id.includes("1")) {
+      var stat = round(bestplayers[index].averages[0], 2);
+      var statName = "Career Points Per Game: ";
+    }
+    if(id.includes("2") || id.includes("3")) {
+      var stat = round(bestplayers[index].averages[1], 2);
+      var statName = "Career Assists Per Game: ";
+    }
+    if(id.includes("4") || id.includes("5")) {
+      var stat = round(bestplayers[index].averages[2], 2);
+      var statName = "Career Rebounds Per G: ";
+    }
+    if(id.includes("6") || id.includes("7")) {
+      var stat = round(bestplayers[index].averages[3], 2);
+      var statName = "Career Steals Per Game: ";
+    }
+    if(id.includes("8") || id.includes("9")) {
+      var stat = round(bestplayers[index].averages[4], 2);
+      var statName = "Career Blocks Per Game: ";
+    }
+    if(id.includes("10") || id.includes("11")) {
+      var stat = round(bestplayers[index].averages[5], 2);
+      var statName = "Career Plus/Minus Score: ";
+    }
+    var info = "<font color='white' size='3'>" + "Player: " + playerName + "</font>" + "<br/>";
+    info += "<font color='white' size='3'> " + statName + "</font> "+ "<font color='white' size='7.5'>" + stat + "<br/>" + "</font>";
+    return info;
+  }
+
+  //TODO: tooltip for stat // +/- is 3 lines vs two lines for the other two 
+
+
+  function getPixels(id) {
+    if(id.includes("one")) {
+      return (d3.event.pageX - 220) + "px";  //change back later
+    } else {
+      return (d3.event.pageX - 220) + "px";
+    }
+  }
+
+  function getColor(id) {
+    if(id.includes("one")) {
+      return "RoyalBlue";
+    } else {
+      return "Crimson";
+    }
+  }
+
+  function setupIndividual() {
+    drawDivider(750, 250, 1270, 250, "black", 1, 1);
+    drawDivider(935, 250, 935, 380, "black", 1, 1);
+    drawDivider(1105, 250, 1105, 380, "black", 1, 1);
+    drawDivider(750, 270, 1270, 270, "black", 1, 1);
+    drawDivider(750, 315, 1270, 315, "black", 1, 1);
+    drawDivider(750, 335, 1270, 335, "black", 1, 1);
+    drawDivider(750, 380, 1270, 380, "black", 1, 1);
+    drawDivider(750, 250, 750, 380, "black", 1, 1);
+    drawDivider(1270, 250, 1270, 380, "black", 1, 1);
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(765, 265)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
+      .text("Points Per Game (PPG)")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(765, 330)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
+      .text("Steals Per Game (SPG)")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(945, 265)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
+      .text("Assists Per Game (APG)")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(945, 330)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .style("font-style", "italic")
+      .text("Blocks Per Game (BPG)")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(1110, 265)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "11.5px")
+      .style("font-style", "italic")
+      .text("Rebounds Per Game (RPG)")
+      .attr("fill", "black");
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(1120, 330)")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "13px")
+      .text("+/- Score for Season")
+      .style("font-style", "italic")
+      .attr("fill", "black");
+
+  }
+
+ 
+
+    
+
+    
+
+  setupIndividual();
+
+  createIndividual(index3, index4, 0);
+
+  function createIndividual(index1, index2, season) {
+    var season = parseInt(season, 10);
+    var season1 = season;
+    var season2 = season;
+
+    // console.log("gonna show " + season + " now");
+
+    if(bestplayers[index1].seasons.length < (season + 1)) {
+      season1 = bestplayers[index1].seasons.length - 1;
+    }
+
+    if(bestplayers[index2].seasons.length < (season + 1)) {
+      season2 = bestplayers[index2].seasons.length - 1;
+    }
+
+    var currSeason = parseInt(season, 10);
+    currSeason = currSeason + 1.0;
+
+    var games1 = bestplayers[index1].seasons[season1].games;
+
+    var ppg1 = (bestplayers[index1].seasons[season1].points/games1).toFixed(2);
+    var apg1 = (bestplayers[index1].seasons[season1].assists/games1).toFixed(2);
+    var rpg1 = (bestplayers[index1].seasons[season1].rebounds/games1).toFixed(2);
+    var bpg1 = (bestplayers[index1].seasons[season1].blocks/games1).toFixed(2);
+    var spg1 = (bestplayers[index1].seasons[season1].steals/games1).toFixed(2);
+    var pl1 = (bestplayers[index1].seasons[season1].plusminus).toFixed(2);
+
+    var games2 = bestplayers[index2].seasons[season2].games;
+
+    var ppg2 = (bestplayers[index2].seasons[season2].points/games2).toFixed(2);
+    var apg2 = (bestplayers[index2].seasons[season2].assists/games2).toFixed(2);
+    var rpg2 = (bestplayers[index2].seasons[season2].rebounds/games2).toFixed(2);
+    var bpg2 = (bestplayers[index2].seasons[season2].blocks/games2).toFixed(2);
+    var spg2 = (bestplayers[index2].seasons[season2].steals/games2).toFixed(2);
+    var pl2 = (bestplayers[index2].seasons[season2].plusminus).toFixed(2);
+
+    appendText(800, 305, ppg1, ppg2, 80, 0, 1, index1, index2);
+    appendText(980, 305, apg1, apg2, 70, 2, 3, index1, index2);
+    appendText(1140, 305, rpg1, rpg2, 70, 4, 5, index1, index2);
+    appendText(800, 370, spg1, spg2, 70, 6, 7, index1, index2);
+    appendText(980, 370, bpg1, bpg2, 70, 8, 9, index1, index2);
+    appendText(1140, 370, pl1, pl2, 70, 10, 11, index1, index2);
+
+    svg.append("text")             
+      .attr("transform",
+          "translate(750, 245)")
+      .attr("id", "individualText")
+      .style("text-anchor", "start")
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .text(function() {
+        if(season1 == 0) {
+          return "Current: Rookie Season (for each player)";
+        } else if(season1 != season2) {
+          return bestplayers[index1].name.replace("*", "") + ": Season " + (season1+1) +
+          ", " + bestplayers[index2].name.replace("*", "") + ": Season " + (season2 + 1);
+        } else {
+          var currSeason = parseInt(season1, 10);
+          currSeason += 1;
+          return "Current: Season " + currSeason + " (for each player)"; 
+        }
+      })
+      .attr("fill", "black");
+  }
+
+  function drawDivider(x1, y1, x2, y2, color, width, opacity) {
+    svg.append("line")
+      .attr("x1", x1)
+      .attr("y1", y1)
+      .attr("x2", x2)
+      .attr("y2", y2)
+      .attr("stroke-width", width)
+      .attr("stroke", color)
+      .style("opacity", opacity);
+  }
+
+  function appendText(moveX, moveY, stat1, stat2, offset, index1, index2, p1index, p2index) {
+    var size1 = "21px";
+    var size2 = "30px";
+
+    if(parseFloat(stat1) > parseFloat(stat2)) {
+      size1 = "30px";
+      size2 = "21px";
+    }
+
+    if(parseFloat(stat1) == parseFloat(stat2)) {
+      size2 = "21px";
+    }
+
+    
+
+    svg.append("text")            
+      .attr("transform",
+          "translate(" + moveX + ", " + moveY + ")")
+      .attr("id", "individuals_" + index1)
+      .style("text-anchor", "middle")
+      .style("font-size", size1)
+      .style("font-style", "italic")
+      .text(stat1.toString())
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .attr("fill", "RoyalBlue")
+      .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)        
+                .style("height", "90px")
+                .style("width", "200px")
+                .style("background", "RoyalBlue");
+            div.html(getIndividualDivInfo(this.id, p1index))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") }) 
+      .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+      });
+
+    svg.append("text")            
+      .attr("transform",
+          "translate(" + (moveX + offset) + ", " + moveY + ")")
+      .attr("id", "individuals_" + index2)
+      .style("text-anchor", "middle")
+      .style("font-size", size2)
+      .style("font-style", "italic")
+      .text(stat2.toString())
+      .style("font-family", "Helvetica, Arial, Sans-Serif")
+      .attr("fill", "Crimson")
+      .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)
+                .style("height", "90px")
+                .style("width", "200px")
+                .style("background", "Crimson");
+            div.html(getIndividualDivInfo(this.id, p2index))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") })
+      .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+      });
+  }
+
+  function createOverview(index, color, which, xScale, otherIndex) {
 
     var line = d3.line()
       .x(function(d, i) { return xScale(i); })
@@ -589,7 +1056,7 @@ d3.csv("seasonstats.csv", function(data) {
       .datum(bestplayers[index].seasons)
       .attr("id", which)
       .attr("class", "line")
-      .attr("transform", "translate(81, 750)")
+      .attr("transform", "translate(800, -100)")
       .attr("d", line)
       .attr("stroke", color)
       .attr("stroke-width", 2)
@@ -597,83 +1064,307 @@ d3.csv("seasonstats.csv", function(data) {
 
     svg.selectAll(".dot" + which)
       .data(bestplayers[index].seasons)
-      .enter().append("circle")
-      .attr("id", function(d, i) { return 'circle_' + which + '_' + i})
+      .enter().append("ellipse")
+      .attr("id", function(d, i) { 
+        return 'circle_' + which + '_' + i; })
       .attr("class", "dot")
       .attr("cx", function(d, i) { return xScale3(i); })
       .attr("cy", function(d) { return getOverviewPos(d); })
-      .attr("transform", "translate(81, 750)")
+      .attr("transform", "translate(800, -100)")
       .attr("fill", color)
-      .attr("r", 5);
+      .attr("rx", function() {
+        if(color == "RoyalBlue") {
+          return 4;
+        } else {
+          return 7;
+        }
+      })
+      .attr("ry", function() {
+        if(color == "RoyalBlue") {
+          return 7;
+        } else {
+          return 4;
+        }
+      })
+      .on("mouseover", function(d) {
+        if(d.playoffs.length > 1) {  
+            div.transition()    
+                .duration(400)    
+                .style("height", "90px")
+                .style("width", "200px")
+                .style("opacity", .9); 
+            div.html(getDivInfo(d, this.id))
+                .style("left", getPixels(this.id))   
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("background", getColor(this.id));
+        } else {
+            var index = d.team.length;
+            var playerName = getPlayerName(this.id);
+            var info = "<font color='white'>" + "Player: " + playerName + "<br/>";
+            info += "Team: " + teammap[d.team[index - 1]] + "<br/>";
+            info += "Player Age: " + d.age + "<br/>";
+            info += "Year: " + d.year + "<br/>" + "<br/>";
+            info += "Did not make playoffs" + "</font>";
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9); 
+            div .html(info)
+                .style("left", getPixels(this.id))   
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("background", getColor(this.id));  
+            }
+        })     
+        .on("mouseout", function(d) {  
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+        })
+        .on("click", function(d) {
+            for(w = 0 ; w < 12 ; w++) {
+                d3.select('#individuals_' + w).remove();
+            }
+            for(r = 0 ; r < 3 ; r++) {
+                d3.select('#individualTextRed_' + r).remove();
+                d3.select('#individualTextBlue_' + r).remove();
+                d3.select('#individualRed_' + r).remove();
+                d3.select('#individualBlue_' + r).remove();
+            }
+            d3.select('#individualText').remove();
+            var id = this.id.substr(this.id.length - 2).replace("_", "");
 
+            if(which == "one") {
+              createIndividual(index, otherIndex, id);
+              createPercentages(index, otherIndex, id);
+            } else {
+              createIndividual(otherIndex, index, id);
+              createPercentages(otherIndex, index, id);
+            }
+        });
     }
 
-    function getOverviewPos(seasonObj) {
-      if(seasonObj.playoffs == "No Playoffs") {
-        return 300;
+    function getStatDefinition(stat)
+      {
+        var definition;
+        var textSize = 2;
+        div.style("height", "208px");
+        if(stat.includes("PPG"))
+        {
+          definition = "The PPG stands for the average points scored per game. "
+              +"Points are scored through field goals (any 2-point shot), free throws (1-point foul shots), or three-point shots.";
+        }
+        if(stat.includes("APG"))
+        {
+          definition = "The APG stands for average number of assists per game. "
+            +"An assist is noted for a player if they pass it to a teammate in a way that leads to the teammate scoring.";
+        }
+        if(stat.includes("RPG"))
+        {
+          definition = "The RBG stands for the average number of rebounds per game. "
+            +"A rebound, sometimes known as a \"board\", is recorded for a player who retrieves the ball after "
+            +"a missed shot.";
+          div.style("height", "220px");
+        }
+        if(stat.includes("BPG"))
+        {
+          definition = "The BPG stands for the average number of blocks per game. "
+            +"A block is given to a player that deflects a shot, but if a foul is called from player contact, no block is recorded.";
+          div.style("height", "220px");
+        }
+        if(stat.includes("SPG"))
+        {
+          definition = " The SPG stands for the average number of steals per game. A steal is awarded to a defensive player who forces a turnover, taking the "
+            +"ball from the offense. A steal can be taken from intercepting a pass or a dribble of the opposing player.";
+          div.style("height", "305px");
+        }
+        if(stat.includes("+/-"))
+        {
+          definition = "The +/- stands for the plus-minus score of a player, a metric that compares how a team performs when a player "
+            +"is on or off the court. The metric calculates the point difference of the two playing teams when the player is playing versus not playing.";
+            div.style("height", "305px");
+        }
+        definition = "<font color = 'white' size = '" + textSize+"'> " + definition + "</font>";
+
+        console.log(definition);
+        return definition;
       }
-      if(seasonObj.playoffs.includes("First Round")) {
+
+//TODO: Delete this; needed to change teh atext type to an html attribute that can take attributes
+    // function wrap(atext, width) {
+    //   console.log("atext: "+atext);
+    //   console.log(typeof atext);
+    //     var words = atext.split(/\s+/).reverse(),
+    //         word,
+    //         line = [],
+    //         lineNumber = 0,
+    //         lineHeight = 1.1, // ems
+    //         y = atext.attr("y"),
+    //         tspan = atext.append("tspan").attr("x", 0).attr("y", y);
+    //     var count = 0;
+    //     while (word = words.pop()) {
+    //       count++;
+    //       line.push(word);
+    //       tspan ++ " ";
+    //       if (tspan.node().getComputedTextLength() > txtWidth-50) {
+    //         line.pop();
+    //         tspan.text(line.join(" "));
+    //         line = [word];
+    //         tspan = atext.append("tspan").attr("x", 0).attr("y", 0).attr("dy", `${++lineNumber * lineHeight + y}em`).text(word);
+    //       }
+    //     }
+    //     return tspan;
+    //   }
+    function getOverviewPos(seasonObj) {
+
+      if(seasonObj.playoffs == "No Playoffs") {
         return 240;
       }
-      if(seasonObj.playoffs.includes("Semifinals")) {
-        return 180;
+      if(seasonObj.playoffs[0].includes("First Round")) {
+        return 200;
       }
-      if(seasonObj.playoffs.includes("Conf") && seasonObj.playoffs.includes("Finals")) {
+      if(seasonObj.playoffs[0].includes("Semifinals")) {
+        return 160;
+      }
+      if(seasonObj.playoffs[0].includes("Conf") && seasonObj.playoffs[0].includes("Finals")) {
         return 120;
       }
-      if(seasonObj.playoffs == "Finals") {
-        return 60;
+      if(seasonObj.playoffs[0].includes("Div") && seasonObj.playoffs[0].includes("Finals")) {
+        return 120;
       }
-      if(seasonObj.playoffs == "Champion") {
-        return 0;
+      if(seasonObj.playoffs[0] == "Finals") {
+        return 80;
+      }
+      if(seasonObj.playoffs[0] == "Champion") {
+        return 40;
       }
     }
 
   svg.append("g")
       .attr("id", "yone")
       .attr("class", "y axis")
+      .attr("transform", "translate(60, 0)")
       .call(d3.axisLeft(getPPGScale(maxPPG)));
 
   svg.append("g")
       .attr("id", "ytwo")
       .attr("class", "y axis")
-      .attr("transform", "translate(120, 0)")
+      .attr("transform", "translate(180, 0)")
       .call(d3.axisLeft(getAPGScale(maxAPG)));
 
   svg.append("g")
       .attr("id", "ythree")
       .attr("class", "y axis")
-      .attr("transform", "translate(240, 0)")
+      .attr("transform", "translate(300, 0)")
       .call(d3.axisLeft(getRPGScale(maxRPG)));
 
   svg.append("g")
       .attr("id", "yfour")
       .attr("class", "y axis")
-      .attr("transform", "translate(360, 0)")
+      .attr("transform", "translate(420, 0)")
       .call(d3.axisLeft(getBPGScale(maxBPG)));
 
   svg.append("g")
       .attr("id", "yfive")
       .attr("class", "y axis")
-      .attr("transform", "translate(480, 0)")
-      .call(d3.axisLeft(getSPGScale(maxPPG)));   
+      .attr("transform", "translate(540, 0)")
+      .call(d3.axisLeft(getSPGScale(maxSPG)));   
 
   svg.append("g")
       .attr("id", "ysix")
       .attr("class", "y axis")
-      .attr("transform", "translate(600, 0)")
+      .attr("transform", "translate(660, 0)")
       .call(d3.axisLeft(getPlusMinusScale(maxPL, minPL)));
 
   svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0, 585)")
+      .attr("id", "statXAxis")
+      .attr("transform", "translate(60, 540)")
       .call(d3.axisBottom(xScale1));
+
+  //TODO: MAYBE DO IT HERE
+  d3.select("#statXAxis")
+    .selectAll(".tick")
+    .on("mouseover", function(d){
+      console.log("The text is" + d);
+      var labelstext = labelDef[d];
+      console.log(labelstext);  
+      div.transition()
+        .duration(400)
+        .style("opacity", .9)
+      div.html(getStatDefinition(d))
+        .style("left", (2) + "px")  
+        .style("top", (380) + "px")
+        .style("width", (86) + "px")
+        .style("background", "grey")})
+    .on("mouseout", function(d){
+      div.transition()
+        .duration(600)
+        .style("opacity", 0)
+        .style("width", "90px")
+        .style("height", "200px");
+    });
+
+  
+  createQuestionTip(38, 552, 30,"Hover over each stat label in this x-axis to read the definition of each stat!"); //put the bubble by the ppg
+  createQuestionTip(138, 235, 40,"Hover your mouse over either name in the Legend to show the Average Stats for Each Season of only that player!"); //tooltip by the legend
+  createQuestionTip(775, 157, 70,"Hover your mouse over any point in the Playoff Results for Each Season graph to see the Playoff results of that series! \nClick any point to get update the charts below, changing the Current season!"); //tooltip by the playoff graph (by the title: 1172, -93, 70   by the x/y axis: 775, 157, 70   by top y-axis: 780, -75, 70)
+  createQuestionTip(755, 393, 40,"Hover over any number in the Average Stats for a Single Season to see the Career Average stats of that player!"); //put the bubble by the ppg
+  function createQuestionTip(x, y, height, textTip)
+  {
+    svg.append("g")
+        .append("circle")
+          .attr("transform",
+            "translate("+x+","+y+")")
+          .attr("r", 6)
+          .attr("fill", "blue")
+          .style("opacity", 0.7)
+    svg.append("g")
+        .append("circle")
+          .attr("transform",
+            "translate("+x+","+y+")")
+          .attr("r", 5)
+          .attr("fill", "aliceblue")
+          .style("opacity", 0.7)
+    svg.append("text")
+        .attr("transform",
+            "translate("+(x-2.5)+","+(y+4)+")")
+        .text("?")
+        .style("font-size", 12)
+        .style("fill", "black")
+        .style("opacity", 0.7);
+    svg.append("g")
+        .append("circle")
+          .attr("transform",
+            "translate("+x+","+y+")")
+          .attr("r", 7)
+          .attr("fill", "aliceblue")
+          .style("opacity", 0)
+          .on("mouseover", function(d)
+          {
+            div.transition()
+                .duration(400)
+                .style("opacity", .9)
+                .style("background", "grey")
+                .style("height", height+"px")
+                .style("width", "220px")
+            div.html(textTip)
+                .style("color", "white")
+                .style("left", (d3.event.pageX + 10) + "px")  
+                .style("top", (d3.event.pageY-(height/2)) + "px")  
+      
+          })
+          .on("mouseout", function(d)
+          {
+            div.transition()
+                .duration(400)
+                .style("opacity", 0)
+          })
+  }
 
   var scales = [ppgScale, apgScale, rpgScale, bpgScale, spgScale, plusminusScale, opacityScale];
 
-  drawLines(index3, "blue", "one", scales);
+  drawLines(index3, "RoyalBlue", "one", scales);
   scales[6] = getOpacityScale(bestplayers[index4].seasons.length);
-  drawLines(index4, "red", "two", scales);
+  drawLines(index4, "Crimson", "two", scales);
   drawLegend(d3.select('select#one').property('value'), d3.select('select#two').property('value'));
 
   function drawLines(index, color, numb, scales) {
@@ -686,12 +1377,13 @@ d3.csv("seasonstats.csv", function(data) {
       var spg = bestplayers[index].seasons[r].steals/games;
       var plusminus = bestplayers[index].seasons[r].plusminus;
 
-      drawLine(0, 120, color, r, ppg, apg, numb, scales);
-      drawLine(120, 240, color, r, apg, rpg, numb, scales);
-      drawLine(240, 360, color, r, rpg, bpg, numb, scales);
-      drawLine(360, 480, color, r, bpg, spg, numb, scales);
-      drawLine(480, 600, color, r, spg, plusminus, numb, scales);
+      drawLine(60, 180, color, r, ppg, apg, numb, scales);
+      drawLine(180, 300, color, r, apg, rpg, numb, scales);
+      drawLine(300, 420, color, r, rpg, bpg, numb, scales);
+      drawLine(420, 540, color, r, bpg, spg, numb, scales);
+      drawLine(540, 660, color, r, spg, plusminus, numb, scales);
     }
+
   }
 
   function drawLine(start, end, color, r, stat1, stat2, numb, scales) {
@@ -704,23 +1396,23 @@ d3.csv("seasonstats.csv", function(data) {
     plusminusScale = scales[5];
     opacityScale = scales[6];
 
-    if(start == 0) {
+    if(start == 60) {
       var y1 = ppgScale(stat1);
       var y2 = apgScale(stat2);
     }
-    if(start == 120) {
+    if(start == 180) {
       var y1 = apgScale(stat1);
       var y2 = rpgScale(stat2);
     }
-    if(start == 240) {
+    if(start == 300) {
       var y1 = rpgScale(stat1);
       var y2 = bpgScale(stat2);
     } 
-    if(start == 360) {
+    if(start == 420) {
       var y1 = bpgScale(stat1);
       var y2 = spgScale(stat2);
     }
-    if(start == 480) {
+    if(start == 540) {
       var y1 = spgScale(stat1);
       var y2 = plusminusScale(stat2);
     }   
@@ -736,65 +1428,189 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("opacity", function(d) { return opacityScale(r); });
   }
 
+  createPercentages(index3, index4, 0);
+
+  function drawCircleStat(stat1, stat2, offset, result, which) {
+    if(result == false) {
+      svg.append("circle")
+        .attr("transform",
+          "translate(" + offset + ", 500)")
+        .attr("id", "individualBlue_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 40)
+        .attr("fill", "RoyalBlue");
+
+      svg.append("circle")
+        .attr("transform",
+          "translate(" + (offset + 95) + ", 490)")
+        .attr("id", "individualRed_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 55)
+        .attr("fill", "Crimson");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 30) + ", 538)")
+        .attr("id", "individualTextBlue_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "22px")
+        .text(stat1 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 125) + ", 530)")
+        .attr("id", "individualTextRed_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "30px")
+        .text(stat2 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+    } else {
+        svg.append("circle")
+        .attr("transform",
+          "translate(" + offset + ", 490)")
+        .attr("id", "individualBlue_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 55)
+        .attr("fill", "RoyalBlue");
+
+      svg.append("circle")
+        .attr("transform",
+          "translate(" + (offset + 95) + ", 500)")
+        .attr("id", "individualRed_" + which)
+        .attr("cx", 30)
+        .attr("cy", 30)
+        .attr("r", 40)
+        .attr("fill", "Crimson");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 30) + ", 530)")
+        .attr("id", "individualTextBlue_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "30px")
+        .text(stat1 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+
+      svg.append("text")            
+        .attr("transform",
+          "translate(" + (offset + 125) + ", 538)")
+        .attr("id", "individualTextRed_" + which)
+        .style("text-anchor", "middle")
+        .style("font-size", "22px")
+        .text(stat2 + "%")
+        .style("font-family", "Helvetica, Arial, Sans-Serif")
+        .style("font-style", "italic")
+        .attr("fill", "white");
+    }
+  }
+
+  function createPercentages(index1, index2, season) {
+    var season = parseInt(season, 10);
+    var season1 = season;
+    var season2 = season;
+
+    if(bestplayers[index1].seasons.length < (season + 1)) {
+      season1 = bestplayers[index1].seasons.length - 1;
+    }
+
+    if(bestplayers[index2].seasons.length < (season + 1)) {
+      season2 = bestplayers[index2].seasons.length - 1;
+    }
+
+    var fg1 = round(bestplayers[index1].seasons[season1].fieldgoalpercent * 100, 2);
+    var fg2 = round(bestplayers[index2].seasons[season2].fieldgoalpercent * 100, 2);
+    var three1 = round(bestplayers[index1].seasons[season1].threepointerpercent * 100, 2);
+    var three2 = round(bestplayers[index2].seasons[season2].threepointerpercent * 100, 2);
+    var ft1 = round(bestplayers[index1].seasons[season1].freethrowpercent * 100, 2);
+    var ft2 = round(bestplayers[index2].seasons[season2].freethrowpercent * 100, 2);
+
+    if(fg1 < fg2) {
+      var offset1 = 730;
+    } else {
+      var offset1 = 750;
+    }
+    
+    if(ft1 < ft2) {
+      var offset2 = 950;
+    } else {
+      var offset2 = 970;
+    }
+
+    if(three1 < three2) {
+      var offset3 = 1165;
+    } else {
+      var offset3 = 1185;
+    }
+    drawCircleStat(fg1, fg2, offset1, fg1 > fg2, 0);
+    drawCircleStat(ft1, ft2, offset2, ft1 > ft2, 1);
+    drawCircleStat(three1, three2, offset3, three1 > three2, 2);
+
+    drawDivider(925, 430, 925, 615, "DarkGrey", 2, 0.3);
+    drawDivider(1145, 430, 1145, 615, "DarkGrey", 2, 0.3);
+
+  }
+
   function drawLegend(player1, player2) {
     svg.append("line")
       .attr("x1", -40)
-      .attr("y1", 180)
+      .attr("y1", 160)
       .attr("x2", -40)
-      .attr("y2", 260)
+      .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
       .attr("x1", 125)
-      .attr("y1", 180)
+      .attr("y1", 160)
       .attr("x2", 125)
-      .attr("y2", 260)
+      .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
     svg.append("line")
       .attr("x1", -40)
-      .attr("y1", 181)
+      .attr("y1", 161)
       .attr("x2", 125)
-      .attr("y2", 181)
-      .attr("stroke-width", 3)
-      .attr("stroke", "black");
-
-    svg.append("line")
-      .attr("x1", -40)
-      .attr("y1", 259)
-      .attr("x2", 125)
-      .attr("y2", 259)
+      .attr("y2", 161)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
       .attr("x1", -40)
-      .attr("y1", 259)
+      .attr("y1", 240)
       .attr("x2", 125)
-      .attr("y2", 259)
+      .attr("y2", 240)
       .attr("stroke-width", 3)
       .attr("stroke", "black");
 
     svg.append("line")
       .attr("x1", -30)
-      .attr("y1", 207)
+      .attr("y1", 187)
       .attr("x2", -4)
-      .attr("y2", 207)
+      .attr("y2", 187)
       .attr("stroke-width", 5)
-      .attr("stroke", "blue");
+      .attr("stroke", "RoyalBlue");
 
     svg.append("line")
       .attr("x1", -30)
-      .attr("y1", 235)
+      .attr("y1", 215)
       .attr("x2", -4)
-      .attr("y2", 235)
+      .attr("y2", 215)
       .attr("stroke-width", 5)
-      .attr("stroke", "red");
+      .attr("stroke", "Crimson");
 
     svg.append("text")   
       .attr("id", "legendone")          
       .attr("transform",
-          "translate(55, 210)")
+          "translate(55, 190)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player1)
@@ -810,15 +1626,16 @@ d3.csv("seasonstats.csv", function(data) {
       .on("mouseout", function() {
         for(a = 0 ; a < 600 ; a++) {
           for(r = 0 ; r < 20 ; r++) {
-            d3.select('#line' + a + "_" + r + "two").style("opacity", function(d) { return opacityScale(r); });
+            d3.select('#line' + a + "_" + r + "two").style("opacity", function(d) { 
+              return opacityScale(r); });
           }
-        }
+        }      
       });
 
     svg.append("text")  
       .attr("id", "legendtwo")          
       .attr("transform",
-          "translate(55, 238)")
+          "translate(55, 218)")
       .style("text-anchor", "middle")
       .style("font-size", "13px")
       .text(player2)
@@ -841,9 +1658,9 @@ d3.csv("seasonstats.csv", function(data) {
 
     svg.append("text")            
       .attr("transform",
-          "translate(40, 170)")
+          "translate(40, 150)")
       .style("text-anchor", "middle")
-      .style("font-size", "18px")
+      .style("font-size", "15px")
       .text("Legend")
       .style("font-family", "Helvetica, Arial, Sans-Serif")
       .attr("fill", "black");
@@ -872,7 +1689,6 @@ d3.csv("seasonstats.csv", function(data) {
     d3.select('#yfive').remove();
     d3.select('#ysix').remove();
 
-    console.log(d3.select('#circle_' + 'one' + '_' + 3));
     for(k = 0 ; k < 25 ; k++) {
       d3.select('#circle_' + 'one' + '_' + k).remove();
       d3.select('#circle_' + 'two' + '_' + k).remove();
@@ -881,6 +1697,17 @@ d3.csv("seasonstats.csv", function(data) {
     d3.select('path#' + 'one').remove();
     d3.select('path#' + 'two').remove();
     d3.select('#overview').remove();
+    for(w = 0 ; w < 12 ; w++) {
+      d3.select('#individuals_' + w).remove();
+    }
+    d3.select('#individualText').remove();
+
+    for(r = 0 ; r < 3 ; r++) {
+      d3.select('#individualTextRed_' + r).remove();
+      d3.select('#individualTextBlue_' + r).remove();
+      d3.select('#individualRed_' + r).remove();
+      d3.select('#individualBlue_' + r).remove();
+    }
     
     var index1 = getIndex(selectValue, bestplayers);
     var index2 = getIndex(selectValueOther, bestplayers);
@@ -904,15 +1731,19 @@ d3.csv("seasonstats.csv", function(data) {
 
     drawAxes(scales);
 
-    drawLines(index1, "blue", "one", scales);
+    drawLines(index1, "RoyalBlue", "one", scales);
 
     scales[6] = getOpacityScale(bestplayers[index2].seasons.length);
-    drawLines(index2, "red", "two", scales);
+    drawLines(index2, "Crimson", "two", scales);
 
     xScale3 = setupOverview(index1, index2);
 
-    createOverview(index1, "blue", "one", xScale3);
-    createOverview(index2, "red", "two", xScale3);
+    createOverview(index1, "RoyalBlue", "one", xScale3, index2);
+    createOverview(index2, "Crimson", "two", xScale3, index1);
+
+    createIndividual(index1, index2, 0);
+
+    createPercentages(index1, index2, 0);
   };
 
   function onchange2() {
@@ -947,6 +1778,17 @@ d3.csv("seasonstats.csv", function(data) {
     d3.select('path#' + 'one').remove();
     d3.select('path#' + 'two').remove();
     d3.select('#overview').remove();
+    for(w = 0 ; w < 12 ; w++) {
+      d3.select('#individuals_' + w).remove();
+    }
+    d3.select('#individualText').remove();
+
+    for(r = 0 ; r < 3 ; r++) {
+      d3.select('#individualTextRed_' + r).remove();
+      d3.select('#individualTextBlue_' + r).remove();
+      d3.select('#individualRed_' + r).remove();
+      d3.select('#individualBlue_' + r).remove();
+    }
 
     var index2 = getIndex(selectValue, bestplayers);
     var index1 = getIndex(selectValueOther, bestplayers);
@@ -970,49 +1812,54 @@ d3.csv("seasonstats.csv", function(data) {
 
     drawAxes(scales);
 
-    drawLines(index2, "red", "two", scales);
+    drawLines(index2, "Crimson", "two", scales);
     scales[6] = getOpacityScale(bestplayers[index2].seasons.length);
-    drawLines(index1, "blue", "one", scales);
+    drawLines(index1, "RoyalBlue", "one", scales);
     xScale3 = setupOverview(index1, index2);
 
-    createOverview(index1, "blue", "one", xScale3);
-    createOverview(index2, "red", "two", xScale3);
+    createOverview(index1, "RoyalBlue", "one", xScale3, index2);
+    createOverview(index2, "Crimson", "two", xScale3, index1);
+
+    createIndividual(index1, index2, 0);
+
+    createPercentages(index1, index2, 0);
   };
 
   function drawAxes(scales) {
     svg.append("g")
       .attr("id", "yone")
       .attr("class", "y axis")
+      .attr("transform", "translate(60, 0)")
       .call(d3.axisLeft(scales[0]));
 
     svg.append("g")
       .attr("id", "ytwo")
       .attr("class", "y axis")
-      .attr("transform", "translate(120, 0)")
+      .attr("transform", "translate(180, 0)")
       .call(d3.axisLeft(scales[1]));
 
     svg.append("g")
       .attr("id", "ythree")
       .attr("class", "y axis")
-      .attr("transform", "translate(240, 0)")
+      .attr("transform", "translate(300, 0)")
       .call(d3.axisLeft(scales[2]));
 
     svg.append("g")
       .attr("id", "yfour")
       .attr("class", "y axis")
-      .attr("transform", "translate(360, 0)")
+      .attr("transform", "translate(420, 0)")
       .call(d3.axisLeft(scales[3]));
 
     svg.append("g")
       .attr("id", "yfive")
       .attr("class", "y axis")
-      .attr("transform", "translate(480, 0)")
+      .attr("transform", "translate(540, 0)")
       .call(d3.axisLeft(scales[4]));   
 
     svg.append("g")
       .attr("id", "ysix")
       .attr("class", "y axis")
-      .attr("transform", "translate(600, 0)")
+      .attr("transform", "translate(660, 0)")
       .call(d3.axisLeft(scales[5]));
   }
 
