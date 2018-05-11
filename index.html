@@ -799,9 +799,6 @@ d3.csv("seasonstats.csv", function(data) {
     return info;
   }
 
-  //TODO: tooltip for stat // +/- is 3 lines vs two lines for the other two 
-
-
   function getPixels(id) {
     if(id.includes("one")) {
       return (d3.event.pageX - 220) + "px";  //change back later
@@ -1188,31 +1185,7 @@ d3.csv("seasonstats.csv", function(data) {
         return definition;
       }
 
-//TODO: Delete this; needed to change teh atext type to an html attribute that can take attributes
-    // function wrap(atext, width) {
-    //   console.log("atext: "+atext);
-    //   console.log(typeof atext);
-    //     var words = atext.split(/\s+/).reverse(),
-    //         word,
-    //         line = [],
-    //         lineNumber = 0,
-    //         lineHeight = 1.1, // ems
-    //         y = atext.attr("y"),
-    //         tspan = atext.append("tspan").attr("x", 0).attr("y", y);
-    //     var count = 0;
-    //     while (word = words.pop()) {
-    //       count++;
-    //       line.push(word);
-    //       tspan ++ " ";
-    //       if (tspan.node().getComputedTextLength() > txtWidth-50) {
-    //         line.pop();
-    //         tspan.text(line.join(" "));
-    //         line = [word];
-    //         tspan = atext.append("tspan").attr("x", 0).attr("y", 0).attr("dy", `${++lineNumber * lineHeight + y}em`).text(word);
-    //       }
-    //     }
-    //     return tspan;
-    //   }
+
     function getOverviewPos(seasonObj) {
 
       if(seasonObj.playoffs == "No Playoffs") {
@@ -1280,7 +1253,6 @@ d3.csv("seasonstats.csv", function(data) {
       .attr("transform", "translate(60, 540)")
       .call(d3.axisBottom(xScale1));
 
-  //TODO: MAYBE DO IT HERE
   d3.select("#statXAxis")
     .selectAll(".tick")
     .on("mouseover", function(d){
@@ -1307,7 +1279,7 @@ d3.csv("seasonstats.csv", function(data) {
   createQuestionTip(38, 552, 30,"Hover over each stat label in this x-axis to read the definition of each stat!"); //put the bubble by the ppg
   createQuestionTip(138, 235, 40,"Hover your mouse over either name in the Legend to show the Average Stats for Each Season of only that player!"); //tooltip by the legend
   createQuestionTip(775, 157, 70,"Hover your mouse over any point in the Playoff Results for Each Season graph to see the Playoff results of that series! \nClick any point to get update the charts below, changing the Current season!"); //tooltip by the playoff graph (by the title: 1172, -93, 70   by the x/y axis: 775, 157, 70   by top y-axis: 780, -75, 70)
-  createQuestionTip(755, 393, 40,"Hover over any number in the Average Stats for a Single Season to see the Career Average stats of that player!"); //put the bubble by the ppg
+  createQuestionTip(755, 393, 40,"Hover over any number in the Average Stats for a Single Season to see the Career Average stats of that player!"); //put the bubble at the bottom of the table
   function createQuestionTip(x, y, height, textTip)
   {
     svg.append("g")
