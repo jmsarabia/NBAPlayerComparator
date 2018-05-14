@@ -782,19 +782,19 @@ d3.csv("seasonstats.csv", function(data) {
   function getAveragePercentage(id, index) {
     var playerName = bestplayers[index].name.replace("*", "");
     if(id.includes("0")) {
-      var stat = round(bestplayers[index].averages[6], 3);
+      var stat = round(bestplayers[index].averages[6], 3) * 100;
       var statName = "Career Field-Goal %: ";
     }
     if(id.includes("1")) {
-      var stat = round(bestplayers[index].averages[7], 3);
+      var stat = round(bestplayers[index].averages[7], 3) * 100;
       var statName = "Career Free-Throw %: ";
     }
     if(id.includes("2")) {
-      var stat = round(bestplayers[index].averages[8], 3);
+      var stat = round(bestplayers[index].averages[8], 3) * 100;
       var statName = "Career Three-Point %: ";
     }
     var info = "<font color='white' size='3'>" + "Player: " + playerName + "</font>" + "<br/>";
-    info += "<font color='white' size='3'> " + statName + "</font> "+ "<font color='white' size='7.5'>" + stat + "<br/>" + "</font>";
+    info += "<font color='white' size='3'> " + statName + "</font> "+ "<font color='white' size='7.5'>" + stat + "%<br/>" + "</font>";
     return info;
   }
 
