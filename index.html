@@ -280,7 +280,7 @@ function checkAverages() {
 }
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
-width = 1500 - margin.left - margin.right,
+width = 1450 - margin.left - margin.right,
 height = 700 - margin.top - margin.bottom;
 var div = d3.select("body").append("div") 
     .attr("class", "tooltip")       
@@ -382,8 +382,8 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'one')
     .style('position', 'absolute')
-    .style('top', '115px')
-    .style('left', '20px')
+    .style('top', '116px')
+    .style('left', '28px')
     .on('change',onchange1)
 
   var options1 = select1
@@ -397,8 +397,8 @@ d3.csv("seasonstats.csv", function(data) {
     .attr('class','select')
     .attr('id', 'two')
     .style('position', 'absolute')
-    .style('top', '145px')
-    .style('left', '20px')
+    .style('top', '146px')
+    .style('left', '28px')
     .on('change',onchange2);
 
   var options2 = select2
@@ -416,17 +416,19 @@ d3.csv("seasonstats.csv", function(data) {
   selection2.selectedIndex = index2;
 
   svg.append("rect")
-    .attr("x", -50)
+    .attr("x", -45)
     .attr("y", -50)
     .attr("width", 175)
-    .attr("height", 100)       // set the x corner curve radius
+    .attr("height", 100)       
     .attr("ry", 10)
     .style("fill", "DarkGrey")
-    .style('position', 'absolute');
+    .style('position', 'absolute')
+    .attr('stroke-width', '3')
+    .attr('stroke', 'black');
 
   svg.append("text")             
     .attr("transform",
-          "translate(36, -25)")
+          "translate(40, -25)")
     .style("text-anchor", "middle")
     .style("font-size", "18px")
     .text("Player Filter")
@@ -450,12 +452,12 @@ d3.csv("seasonstats.csv", function(data) {
     .attr("id", "pic_one")
     .attr("height", 215)
     .attr("width", 358.33)
-    .attr("x", 105)
+    .attr("x", 115)
     .attr("y", 70);
 
   svg.append("text")             
     .attr("transform",
-        "translate(235, 185)")
+        "translate(243, 185)")
     .attr("id", "text_one")
     .style("text-anchor", "middle")
     .style("font-family", "Helvetica, Arial, Sans-Serif")
@@ -729,11 +731,11 @@ d3.csv("seasonstats.csv", function(data) {
         
         var xScale2 = d3.scaleBand()
           .domain(slicedArr)
-          .range([0, (width - 670) - 200]);
+          .range([0, (width - 620) - 200]);
         
         var xScale3 = d3.scaleLinear()
           .domain([0, slicedArr.length])
-          .range([0, (width - 670) - 200]);
+          .range([0, (width - 620) - 200]);
 
       svg.append("g")
         .attr("class", "x axis")
@@ -817,7 +819,7 @@ d3.csv("seasonstats.csv", function(data) {
   }
 
   function getIndividualDivInfo(id, index) {
-    div.style("width")
+    div.style("width");
     var playerName = bestplayers[index].name.replace("*", "");
     if(id.includes("0") || id.includes("1")) {
       var stat = round(bestplayers[index].averages[0], 2);
@@ -1129,13 +1131,15 @@ d3.csv("seasonstats.csv", function(data) {
         } else {
             var index = d.team.length;
             var playerName = getPlayerName(this.id);
-            var info = "<font color='white'>" + "Player: " + playerName + "<br/>";
+            var info = "<font color='white' size=2.75>" + "Player: " + playerName + "<br/>";
             info += "Team: " + teammap[d.team[index - 1]] + "<br/>";
             info += "Player Age: " + d.age + "<br/>";
-            info += "Year: " + d.year + "<br/>" + "<br/>";
+            info += "Year: " + d.year + "<br/>";
             info += "Did not make playoffs" + "</font>";
             div.transition()    
-                .duration(400)    
+                .duration(400)
+                .style("height", "75px")
+                .style("width", "200px")    
                 .style("opacity", .9); 
             div .html(info)
                 .style("left", getPixels(this.id))   
@@ -1172,48 +1176,50 @@ d3.csv("seasonstats.csv", function(data) {
 
     function getStatDefinition(stat) {
         var definition;
-        var textSize = 2;
-        div.style("height", "208px");
+        var textSize = 2.75;
 
         if(stat.includes("PPG"))
         {
-          definition = "The PPG stands for the average points scored per game. "
-              +"Points are scored through field goals (any 2-point shot), free throws (1-point foul shots), or three-point shots.";
+          definition = "PPG stands for 'Points Per Game', which is the amount of points a player scores per game."
+              +"  Points are scored through field-goals (any 2-point shot), free throws (foul shots), or three-point shots.";
+          div.style("height", "105px");
         }
 
         if(stat.includes("APG"))
         {
-          definition = "The APG stands for average number of assists per game. "
+          definition = "APG stands for 'Assists Per Game', which is the amount of assists a player gets per game. "
             +"An assist is noted for a player if they pass it to a teammate in a way that leads to the teammate scoring.";
+          div.style("height", "105px");
         }
 
         if(stat.includes("RPG"))
         {
-          definition = "The RBG stands for the average number of rebounds per game. "
-            +"A rebound, sometimes known as a \"board\", is recorded for a player who retrieves the ball after "
+          definition = "RBG stands for 'Rebounds Per Game', which is the number of rebounds obtained per game. "
+            +"A rebound, sometimes referred to as a \"board\", is recorded for a player if he retrieves the ball after "
             +"a missed shot.";
-          div.style("height", "220px");
+          div.style("height", "105px");
         }
 
         if(stat.includes("BPG"))
         {
-          definition = "The BPG stands for the average number of blocks per game. "
-            +"A block is given to a player that deflects a shot, but if a foul is called from player contact, no block is recorded.";
-          div.style("height", "220px");
+          definition = "BPG stands for 'Blocks Per Game', which is the number of blocks committed per game. "
+            +"A block is given to a player that deflects a shot; but if a foul is called from player contact, no block is recorded.";
+          div.style("height", "105px");
         }
 
         if(stat.includes("SPG"))
         {
-          definition = " The SPG stands for the average number of steals per game. A steal is awarded to a defensive player who forces a turnover, taking the "
-            +"ball from the offense. A steal can be taken from intercepting a pass or a dribble of the opposing player.";
-          div.style("height", "305px");
+          definition = " SPG stands for 'Steals Per Game', which is the number of steals obtained per game. A steal is awarded to a defensive player who forces a turnover, taking the "
+            +"ball from the team on offense."
+          div.style("height", "98px");
         }
 
         if(stat.includes("+/-"))
         {
-          definition = "The +/- stands for the plus-minus score of a player, a metric that compares how a team performs when a player "
-            +"is on or off the court. The metric calculates the point difference of the two playing teams when the player is playing versus not playing.";
-            div.style("height", "305px");
+          definition = "+/- stands for the 'Plus-Minus Score' of a player, which is a metric that compares how a team performs when a player "
+            +"is on or off the court. The metric calculates the point difference of the two teams when the player is playing versus not playing.";
+
+          div.style("height", "120px");
         }
 
         definition = "<font color = 'white' size = '" + textSize+"'> " + definition + "</font>";
@@ -1297,46 +1303,50 @@ d3.csv("seasonstats.csv", function(data) {
         .duration(400)
         .style("opacity", .9)
       div.html(getStatDefinition(d))
-        .style("left", (2) + "px")  
-        .style("top", (380) + "px")
-        .style("width", (86) + "px")
+        // .style("left", (2) + "px")  
+        // .style("top", (380) + "px") //temporarily removed
+        .style("left", (d3.event.pageX - 28) + "px")
+        .style("top", (d3.event.pageY - 150) + "px")
+        .style("width", "200px")
         .style("background", "grey")})
     .on("mouseout", function(d){
       div.transition()
         .duration(600)
         .style("opacity", 0)
-        .style("width", "90px")
-        .style("height", "200px");
+        .style("width", "200px")
   });
   
-  createQuestionTip(38, 552, 30,"Hover over each stat label in this x-axis to read the definition of each stat!"); //put the bubble by the ppg
-  createQuestionTip(138, 235, 40,"Hover your mouse over either name in the Legend to show the Average Stats for Each Season of only that player!"); //tooltip by the legend
-  createQuestionTip(775, 157, 70,"Hover your mouse over any point in the Playoff Results for Each Season graph to see the Playoff results of that series! \nClick any point to get update the charts below, changing the Current season!"); //tooltip by the playoff graph (by the title: 1172, -93, 70   by the x/y axis: 775, 157, 70   by top y-axis: 780, -75, 70)
-  createQuestionTip(755, 393, 40,"Hover over any number in the Average Stats for a Single Season to see the Career Average stats of that player!"); //put the bubble at the bottom of the table
+  createQuestionTip(28, 552, 40,"Hover your mouse over any of the stat labels in this x-axis to read the definition of that stat!"); //put the bubble by the ppg
+  createQuestionTip(145, 230, 45,"Hover your mouse over either player's name in the Legend to filter out the other player!"); //tooltip by the legend
+  createQuestionTip(770, 163, 90,"Hover your mouse over any point in the 'Playoff Results for Each Season' graph to see the Playoff results for that series! \nAlso, click any point in the graph to update the two charts below, which changes the 'Current:' season label!"); //tooltip by the playoff graph (by the title: 1172, -93, 70   by the x/y axis: 775, 157, 70   by top y-axis: 780, -75, 70)
+  createQuestionTip(755, 393, 40,"Hover over any number in the 'Average Stats for a Single Season' chart to see the career average stat for either player!"); //put the bubble at the bottom of the table
+
+  createQuestionTip(700, 570, 30,"Hover over any circle to see the career average stat for either player!"); //add another buble for circles chart
+
   function createQuestionTip(x, y, height, textTip)
   {
     svg.append("g")
         .append("circle")
           .attr("transform",
             "translate("+x+","+y+")")
-          .attr("r", 6)
-          .attr("fill", "blue")
+          .attr("r", 8)
+          .attr("fill", "black")
           .style("opacity", 0.7);
 
     svg.append("g")
         .append("circle")
           .attr("transform",
             "translate("+x+","+y+")")
-          .attr("r", 5)
-          .attr("fill", "aliceblue")
+          .attr("r", 6)
+          .attr("fill", "DarkGrey")
           .style("opacity", 0.7);
 
     svg.append("text")
         .attr("transform",
-            "translate("+(x-2.5)+","+(y+4)+")")
+            "translate("+(x-3.5)+","+(y+5)+")")
         .text("?")
-        .style("font-size", 12)
-        .style("fill", "black")
+        .style("font-size", 14)
+        .style("fill", "white")
         .style("opacity", 0.7);
 
     svg.append("g")
@@ -1344,7 +1354,7 @@ d3.csv("seasonstats.csv", function(data) {
           .attr("transform",
             "translate("+x+","+y+")")
           .attr("r", 7)
-          .attr("fill", "aliceblue")
+          .attr("fill", "DarkGrey")
           .style("opacity", 0)
           .on("mouseover", function(d)
           {
@@ -1357,7 +1367,9 @@ d3.csv("seasonstats.csv", function(data) {
             div.html(textTip)
                 .style("color", "white")
                 .style("left", (d3.event.pageX + 10) + "px")  
-                .style("top", (d3.event.pageY-(height/2)) + "px")  
+                .style("top", (d3.event.pageY-(height/2)) + "px") 
+                .style("height", "90px")
+                .style("width", "200px") 
       
           })
           .on("mouseout", function(d)
@@ -1365,6 +1377,8 @@ d3.csv("seasonstats.csv", function(data) {
             div.transition()
                 .duration(400)
                 .style("opacity", 0)
+                .style("height", "90px")
+                .style("width", "200px")
           })
   }
 
@@ -1568,27 +1582,9 @@ d3.csv("seasonstats.csv", function(data) {
     var ft1 = round(bestplayers[index1].seasons[season1].freethrowpercent * 100, 2);
     var ft2 = round(bestplayers[index2].seasons[season2].freethrowpercent * 100, 2);
 
-    // if(fg1 < fg2) {
-    //   var offset1 = 730;
-    // } else {
-    //   var offset1 = 750;
-    // }
-    
-    // if(ft1 < ft2) {
-    //   var offset2 = 950;
-    // } else {
-    //   var offset2 = 970;
-    // }
-
-    // if(three1 < three2) {
-    //   var offset3 = 1165;
-    // } else {
-    //   var offset3 = 1185;
-    // }
-
     drawCircleStat(fg1, fg2, 0, 720, index1, index2);
     drawCircleStat(ft1, ft2, 1, 940, index1, index2);
-    drawCircleStat(three1, three2, 2, 1157, index1, index2);
+    drawCircleStat(three1, three2, 2, 1165, index1, index2);
     drawDivider(918, 430, 918, 615, "DarkGrey", 2, 0.3);
     drawDivider(1142, 430, 1142, 615, "DarkGrey", 2, 0.3);
   }
