@@ -208,13 +208,22 @@ function round(value, precision) {
 
 function setAverages(bestplayers) {
   for(e = 0 ; e < bestplayers.length ; e++) {
+
     var averagePoints = 0;
     var averageAssists = 0;
     var averageRebounds = 0;
     var averageSteals = 0;
     var averageBlocks = 0;
     var averagePL = 0;
+    var averageFG = 0;
+    var averageFGA = 0;
+    var averageFT = 0;
+    var averageFTA = 0;
+    var averageT = 0;
+    var averageTA = 0;
+
     var games = 0;
+
     for(q = 0 ; q < bestplayers[e].seasons.length ; q++) {
       games += bestplayers[e].seasons[q].games;
       averagePoints += bestplayers[e].seasons[q].points;
@@ -222,14 +231,28 @@ function setAverages(bestplayers) {
       averageRebounds += bestplayers[e].seasons[q].rebounds;
       averageSteals += bestplayers[e].seasons[q].steals;
       averageBlocks += bestplayers[e].seasons[q].blocks;
+      averageFG += bestplayers[e].seasons[q].fieldgoals;
+      averageFGA += bestplayers[e].seasons[q].fieldgoalsAttempted;
+      averageFT += bestplayers[e].seasons[q].freethrows;
+      averageFTA += bestplayers[e].seasons[q].freethrowsAttempted;
+      averageT += bestplayers[e].seasons[q].threepointers;
+      averageTA += bestplayers[e].seasons[q].threepointersAttempted;
+
       // averagePL += bestplayers[e].seasons[q].plusminus;
     }
+
     averagePoints = averagePoints/games;
     averageAssists = averageAssists/games;
     averageRebounds = averageRebounds/games;
     averageSteals = averageSteals/games;
     averageBlocks = averageBlocks/games;
+
+    averageFG = averageFG/averageFGA;
+    averageFT = averageFT/averageFTA;
+    averageT = averageT/averageTA;
+
     // averagePL = averagePL/bestplayers[e].seasons.length;
+
     bestplayers[e].averages[0] = averagePoints;
     bestplayers[e].averages[1] = averageAssists;
     bestplayers[e].averages[2] = averageRebounds;
@@ -237,8 +260,9 @@ function setAverages(bestplayers) {
     bestplayers[e].averages[4] = averageBlocks;
     bestplayers[e].averages[5] = getCareerPL(bestplayers[e].name);
     bestplayers[e].averages[6] = averageFG;
-    bestplayers[e].averages[7] = averageThree;
-    bestplayers[e].averages[8] = averageFT;
+    bestplayers[e].averages[7] = averageFT;
+    bestplayers[e].averages[8] = averageT;
+
   }
 }
 
@@ -309,11 +333,15 @@ d3.csv("seasonstats.csv", function(data) {
         plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
         age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
         fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-        freethrowpercent: +d.FTPERC, playoffs: null};
+        freethrowpercent: +d.FTPERC, playoffs: null, fieldgoals: +d.FG,
+        fieldgoalsAttempted: +d.FGA, threepointers: +d.THREEP,
+        threepointersAttempted: +d.THREEPA, freethrows: +d.FT,
+        freethrowsAttempted: +d.FTA};
 
       var player = {name: d.Player, seasons: [], averages: []};
       player.seasons.push(season);     
       allplayers.push(player);
+
     } else {
       var yearIndex = yearAdded(index, +d.Year);
       
@@ -323,8 +351,13 @@ d3.csv("seasonstats.csv", function(data) {
           plusminus: +d.BPM, games: +d.G, position: d.Pos, team: [d.Tm],
           age: +d.Age, minutes: +d.MP, threepointers: +d.THREEP,
           fieldgoalpercent: +d.FGPERC, threepointerpercent: +d.THREEPPERC,
-          freethrowpercent: +d.FTPERC, playoffs: null};
+          freethrowpercent: +d.FTPERC, playoffs: null, fieldgoals: +d.FG,
+          fieldgoalsAttempted: +d.FGA, threepointers: +d.THREEP,
+          threepointersAttempted: +d.THREEPA, freethrows: +d.FT,
+          freethrowsAttempted: +d.FTA};
+
           allplayers[index].seasons.push(season);
+
       } else {
         allplayers[index].seasons[yearIndex].team.push(d.Tm);
       }
@@ -340,8 +373,10 @@ d3.csv("seasonstats.csv", function(data) {
     var y = b.name.toLowerCase();
     return x < y ? -1 : x > y ? 1 : 0;
   });
+
   // debugging1(bestplayers);
   // debugging2();
+
   var select1 = d3.select('body')
     .append('select')
     .attr('class','select')
@@ -744,6 +779,26 @@ d3.csv("seasonstats.csv", function(data) {
     return info;
   }
 
+  function getAveragePercentage(id, index) {
+    // div.style("width")
+    var playerName = bestplayers[index].name.replace("*", "");
+    if(id.includes("0")) {
+      var stat = round(bestplayers[index].averages[6], 3);
+      var statName = "Career Field-Goal %: ";
+    }
+    if(id.includes("1")) {
+      var stat = round(bestplayers[index].averages[7], 3);
+      var statName = "Career Free-Throw %: ";
+    }
+    if(id.includes("2")) {
+      var stat = round(bestplayers[index].averages[8], 3);
+      var statName = "Career Three-Point %: ";
+    }
+    var info = "<font color='white' size='3'>" + "Player: " + playerName + "</font>" + "<br/>";
+    info += "<font color='white' size='3'> " + statName + "</font> "+ "<font color='white' size='7.5'>" + stat + "<br/>" + "</font>";
+    return info;
+  }
+
   function getIndividualDivInfo(id, index) {
     div.style("width")
     var playerName = bestplayers[index].name.replace("*", "");
@@ -793,6 +848,7 @@ d3.csv("seasonstats.csv", function(data) {
   }
 
   function setupIndividual() {
+
     drawDivider(750, 250, 1270, 250, "black", 1, 1);
     drawDivider(935, 250, 935, 380, "black", 1, 1);
     drawDivider(1105, 250, 1105, 380, "black", 1, 1);
@@ -1307,6 +1363,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   function drawLines(index, color, numb, scales) {
     for(var r = 0 ; r < bestplayers[index].seasons.length ; r++) {
+
       var games = bestplayers[index].seasons[r].games;
       var ppg = bestplayers[index].seasons[r].points/games;
       var apg = bestplayers[index].seasons[r].assists/games;
@@ -1319,6 +1376,7 @@ d3.csv("seasonstats.csv", function(data) {
       drawLine(300, 420, color, r, rpg, bpg, numb, scales);
       drawLine(420, 540, color, r, bpg, spg, numb, scales);
       drawLine(540, 660, color, r, spg, plusminus, numb, scales);
+
     }
   }
 
@@ -1367,7 +1425,7 @@ d3.csv("seasonstats.csv", function(data) {
 
   createPercentages(index3, index4, 0);
 
-  function drawCircleStat(stat1, stat2, offset, result, which) {
+  function drawCircleStat(stat1, stat2, offset, result, which, index1, index2) {
     if(result == false) {
 
       svg.append("circle")
@@ -1377,7 +1435,23 @@ d3.csv("seasonstats.csv", function(data) {
         .attr("cx", 30)
         .attr("cy", 30)
         .attr("r", 40)
-        .attr("fill", "RoyalBlue");
+        .attr("fill", "RoyalBlue")
+        .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)        
+                .style("height", "90px")
+                .style("width", "200px")
+                .style("background", "RoyalBlue");
+              console.log(this.id);
+            div.html(getAveragePercentage(this.id, index1))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") }) 
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+        });
 
       svg.append("circle")
         .attr("transform",
@@ -1386,7 +1460,22 @@ d3.csv("seasonstats.csv", function(data) {
         .attr("cx", 30)
         .attr("cy", 30)
         .attr("r", 55)
-        .attr("fill", "Crimson");
+        .attr("fill", "Crimson")
+        .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)        
+                .style("height", "90px")
+                .style("width", "200px")
+                .style("background", "Crimson");
+            div.html(getAveragePercentage(this.id, index2))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") }) 
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+      });
 
       svg.append("text")            
         .attr("transform",
@@ -1419,7 +1508,22 @@ d3.csv("seasonstats.csv", function(data) {
         .attr("cx", 30)
         .attr("cy", 30)
         .attr("r", 55)
-        .attr("fill", "RoyalBlue");
+        .attr("fill", "RoyalBlue")
+                .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)        
+                .style("height", "90px")
+                .style("width", "200px")
+                .style("background", "RoyalBlue");
+            div.html(getAveragePercentage(this.id, index1))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") }) 
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+      });
 
       svg.append("circle")
         .attr("transform",
@@ -1428,7 +1532,22 @@ d3.csv("seasonstats.csv", function(data) {
         .attr("cx", 30)
         .attr("cy", 30)
         .attr("r", 40)
-        .attr("fill", "Crimson");
+        .attr("fill", "Crimson")
+                .on("mouseover", function(d) {  
+            div.transition()    
+                .duration(400)    
+                .style("opacity", .9)        
+                .style("height", "90px")
+                .style("width", "200px")
+                .style("background", "Crimson");
+            div.html(getAveragePercentage(this.id, index2))
+                .style("left", (d3.event.pageX - 230) + "px")  
+                .style("top", (d3.event.pageY - 28) + "px") }) 
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(600)    
+                .style("opacity", 0);
+      });
 
       svg.append("text")            
         .attr("transform",
@@ -1484,14 +1603,16 @@ d3.csv("seasonstats.csv", function(data) {
     } else {
       var offset2 = 970;
     }
+
     if(three1 < three2) {
       var offset3 = 1165;
     } else {
       var offset3 = 1185;
     }
-    drawCircleStat(fg1, fg2, offset1, fg1 > fg2, 0);
-    drawCircleStat(ft1, ft2, offset2, ft1 > ft2, 1);
-    drawCircleStat(three1, three2, offset3, three1 > three2, 2);
+
+    drawCircleStat(fg1, fg2, offset1, fg1 > fg2, 0, index1, index2);
+    drawCircleStat(ft1, ft2, offset2, ft1 > ft2, 1, index1, index2);
+    drawCircleStat(three1, three2, offset3, three1 > three2, 2, index1, index2);
     drawDivider(925, 430, 925, 615, "DarkGrey", 2, 0.3);
     drawDivider(1145, 430, 1145, 615, "DarkGrey", 2, 0.3);
   }
