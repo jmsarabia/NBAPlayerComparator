@@ -236,6 +236,9 @@ function setAverages(bestplayers) {
     bestplayers[e].averages[3] = averageSteals;
     bestplayers[e].averages[4] = averageBlocks;
     bestplayers[e].averages[5] = getCareerPL(bestplayers[e].name);
+    bestplayers[e].averages[6] = averageFG;
+    bestplayers[e].averages[7] = averageThree;
+    bestplayers[e].averages[8] = averageFT;
   }
 }
 
@@ -258,12 +261,14 @@ height = 700 - margin.top - margin.bottom;
 var div = d3.select("body").append("div") 
     .attr("class", "tooltip")       
     .style("opacity", 0);
+
 //adding svg to page
 var svg = d3.select("body").append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + 120 + ")");
+
 d3.csv("plusminus.csv", function(data) {
   data.forEach(function(d) {
     var playerName = d.Player;
@@ -272,6 +277,7 @@ d3.csv("plusminus.csv", function(data) {
     careerPL.push(playerObj);
   });
 });
+
 d3.csv("playoffs.csv", function(data) {
   data.forEach(function(d) {
     var year = +d.Yr;
@@ -280,15 +286,18 @@ d3.csv("playoffs.csv", function(data) {
       if(index == -1) {
         var playoffRound = {playoffYear: year, results: []};
         var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW, gW: +d.GamesW, gL: +d.GamesL};
+
         playoffRound.results.push(result);
         playoffsArr.push(playoffRound);
       } else {
         var result = {series: d.Series, loser: d.TeamL, winner: d.TeamW, gW: +d.GamesW, gL: +d.GamesL};
+
         playoffsArr[index].results.push(result);
       }
     }
   });
 });
+
 //reading in player data
 d3.csv("seasonstats.csv", function(data) {
   data.forEach(function(d) {
