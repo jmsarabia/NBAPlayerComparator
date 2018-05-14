@@ -280,7 +280,7 @@ function checkAverages() {
 }
 //setting up the margins
 var margin = {top: 50, right: 50, bottom: 50, left: 50},
-width = 1400 - margin.left - margin.right,
+width = 1500 - margin.left - margin.right,
 height = 700 - margin.top - margin.bottom;
 var div = d3.select("body").append("div") 
     .attr("class", "tooltip")       
@@ -633,6 +633,24 @@ d3.csv("seasonstats.csv", function(data) {
     return opacityScale;
   }
 
+  function getCircleScale(stat1, stat2) {
+    if(stat1 > stat2) {
+      var circleScale = d3.scaleLinear().domain([0, stat1]).range([35, 55]);
+    } else {
+      var circleScale = d3.scaleLinear().domain([0, stat2]).range([35, 55]);
+    }
+    return circleScale;
+  }
+
+  function getTextScale(stat1, stat2) {
+    if(stat1 > stat2) {
+      var circleScale = d3.scaleLinear().domain([0, stat1]).range([22, 30]);
+    } else {
+      var circleScale = d3.scaleLinear().domain([0, stat2]).range([22, 30]);
+    }
+    return circleScale;
+  }
+
   ppgScale = getPPGScale(maxPPG);
   apgScale = getAPGScale(maxAPG);
   rpgScale = getRPGScale(maxRPG);
@@ -711,11 +729,11 @@ d3.csv("seasonstats.csv", function(data) {
         
         var xScale2 = d3.scaleBand()
           .domain(slicedArr)
-          .range([0, (width - 570) - 200]);
+          .range([0, (width - 670) - 200]);
         
         var xScale3 = d3.scaleLinear()
           .domain([0, slicedArr.length])
-          .range([0, (width - 570) - 200]);
+          .range([0, (width - 670) - 200]);
 
       svg.append("g")
         .attr("class", "x axis")
@@ -1424,16 +1442,20 @@ d3.csv("seasonstats.csv", function(data) {
 
   createPercentages(index3, index4, 0);
 
-  function drawCircleStat(stat1, stat2, offset, result, which, index1, index2) {
-    if(result == false) {
+  function drawCircleStat(stat1, stat2, which, offset, index1, index2) {
+      circleScale = getCircleScale(stat1, stat2);
+      radius1 = circleScale(stat1);
+      radius2 = circleScale(stat2);
+
+      textScale = getTextScale(stat1, stat2);
+      text1 = textScale(stat1);
+      text2 = textScale(stat2);
 
       svg.append("circle")
-        .attr("transform",
-          "translate(" + offset + ", 500)")
         .attr("id", "individualBlue_" + which)
-        .attr("cx", 30)
-        .attr("cy", 30)
-        .attr("r", 40)
+        .attr("cx", offset+34)
+        .attr("cy", 510)
+        .attr("r", radius1)
         .attr("fill", "RoyalBlue")
         .on("mouseover", function(d) {  
             div.transition()    
@@ -1442,23 +1464,20 @@ d3.csv("seasonstats.csv", function(data) {
                 .style("height", "90px")
                 .style("width", "200px")
                 .style("background", "RoyalBlue");
-              console.log(this.id);
             div.html(getAveragePercentage(this.id, index1))
                 .style("left", (d3.event.pageX - 230) + "px")  
                 .style("top", (d3.event.pageY - 28) + "px") }) 
-        .on("mouseout", function(d) {   
+        .on("mouseout", function(d) {
             div.transition()    
                 .duration(600)    
                 .style("opacity", 0);
         });
 
       svg.append("circle")
-        .attr("transform",
-          "translate(" + (offset + 95) + ", 490)")
         .attr("id", "individualRed_" + which)
-        .attr("cx", 30)
-        .attr("cy", 30)
-        .attr("r", 55)
+        .attr("cx", offset+(radius1*2.5))
+        .attr("cy", 510)
+        .attr("r", radius2)
         .attr("fill", "Crimson")
         .on("mouseover", function(d) {  
             div.transition()    
@@ -1476,13 +1495,13 @@ d3.csv("seasonstats.csv", function(data) {
                 .style("opacity", 0);
       });
 
-      svg.append("text")            
+      svg.append("text")
         .attr("transform",
-          "translate(" + (offset + 30) + ", 538)")
+          "translate(" + (offset) + ", 520)")
         .attr("id", "individualTextBlue_" + which)
-        .style("text-anchor", "middle")
-        .style("font-size", "22px")
-        .text(stat1 + "%")
+        .style("text-anchor", "left")
+        .style("font-size", "24px")
+        .text(stat1.toFixed(1) + "%")
         .style("font-family", "Helvetica, Arial, Sans-Serif")
         .style("font-style", "italic")
         .attr("fill", "white")
@@ -1493,7 +1512,6 @@ d3.csv("seasonstats.csv", function(data) {
                 .style("height", "90px")
                 .style("width", "200px")
                 .style("background", "RoyalBlue");
-              console.log(this.id);
             div.html(getAveragePercentage(this.id, index1))
                 .style("left", (d3.event.pageX - 230) + "px")  
                 .style("top", (d3.event.pageY - 28) + "px") }) 
@@ -1506,10 +1524,10 @@ d3.csv("seasonstats.csv", function(data) {
 
       svg.append("text")            
         .attr("transform",
-          "translate(" + (offset + 125) + ", 530)")
+          "translate(" + (offset + 100) + ", 520)")
         .attr("id", "individualTextRed_" + which)
-        .style("text-anchor", "middle")
-        .style("font-size", "30px")
+        .style("text-anchor", "left")
+        .style("font-size", "24px")
         .text(stat2 + "%")
         .style("font-family", "Helvetica, Arial, Sans-Serif")
         .style("font-style", "italic")
@@ -1529,109 +1547,6 @@ d3.csv("seasonstats.csv", function(data) {
                 .duration(600)    
                 .style("opacity", 0);
       });
-
-    } else {
-
-        svg.append("circle")
-        .attr("transform",
-          "translate(" + offset + ", 490)")
-        .attr("id", "individualBlue_" + which)
-        .attr("cx", 30)
-        .attr("cy", 30)
-        .attr("r", 55)
-        .attr("fill", "RoyalBlue")
-        .on("mouseover", function(d) {  
-            div.transition()    
-                .duration(400)    
-                .style("opacity", .9)        
-                .style("height", "90px")
-                .style("width", "200px")
-                .style("background", "RoyalBlue");
-            div.html(getAveragePercentage(this.id, index1))
-                .style("left", (d3.event.pageX - 230) + "px")  
-                .style("top", (d3.event.pageY - 28) + "px") }) 
-        .on("mouseout", function(d) {   
-            div.transition()    
-                .duration(600)    
-                .style("opacity", 0);
-      });
-
-      svg.append("circle")
-        .attr("transform",
-          "translate(" + (offset + 95) + ", 500)")
-        .attr("id", "individualRed_" + which)
-        .attr("cx", 30)
-        .attr("cy", 30)
-        .attr("r", 40)
-        .attr("fill", "Crimson")
-        .on("mouseover", function(d) {  
-            div.transition()    
-                .duration(400)    
-                .style("opacity", .9)        
-                .style("height", "90px")
-                .style("width", "200px")
-                .style("background", "Crimson");
-            div.html(getAveragePercentage(this.id, index2))
-                .style("left", (d3.event.pageX - 230) + "px")  
-                .style("top", (d3.event.pageY - 28) + "px") }) 
-        .on("mouseout", function(d) {   
-            div.transition()    
-                .duration(600)    
-                .style("opacity", 0);
-      });
-
-      svg.append("text")            
-        .attr("transform",
-          "translate(" + (offset + 30) + ", 530)")
-        .attr("id", "individualTextBlue_" + which)
-        .style("text-anchor", "middle")
-        .style("font-size", "30px")
-        .text(stat1 + "%")
-        .style("font-family", "Helvetica, Arial, Sans-Serif")
-        .style("font-style", "italic")
-        .attr("fill", "white")
-        .on("mouseover", function(d) {  
-            div.transition()    
-                .duration(400)    
-                .style("opacity", .9)        
-                .style("height", "90px")
-                .style("width", "200px")
-                .style("background", "RoyalBlue");
-            div.html(getAveragePercentage(this.id, index1))
-                .style("left", (d3.event.pageX - 230) + "px")  
-                .style("top", (d3.event.pageY - 28) + "px") }) 
-        .on("mouseout", function(d) {   
-            div.transition()    
-                .duration(600)    
-                .style("opacity", 0);
-      });
-
-      svg.append("text")            
-        .attr("transform",
-          "translate(" + (offset + 125) + ", 538)")
-        .attr("id", "individualTextRed_" + which)
-        .style("text-anchor", "middle")
-        .style("font-size", "22px")
-        .text(stat2 + "%")
-        .style("font-family", "Helvetica, Arial, Sans-Serif")
-        .style("font-style", "italic")
-        .attr("fill", "white")
-        .on("mouseover", function(d) {  
-            div.transition()    
-                .duration(400)    
-                .style("opacity", .9)        
-                .style("height", "90px")
-                .style("width", "200px")
-                .style("background", "Crimson");
-            div.html(getAveragePercentage(this.id, index2))
-                .style("left", (d3.event.pageX - 230) + "px")  
-                .style("top", (d3.event.pageY - 28) + "px") }) 
-        .on("mouseout", function(d) {   
-            div.transition()    
-                .duration(600)    
-                .style("opacity", 0);
-      });
-    }
   }
 
   function createPercentages(index1, index2, season) {
@@ -1653,29 +1568,29 @@ d3.csv("seasonstats.csv", function(data) {
     var ft1 = round(bestplayers[index1].seasons[season1].freethrowpercent * 100, 2);
     var ft2 = round(bestplayers[index2].seasons[season2].freethrowpercent * 100, 2);
 
-    if(fg1 < fg2) {
-      var offset1 = 730;
-    } else {
-      var offset1 = 750;
-    }
+    // if(fg1 < fg2) {
+    //   var offset1 = 730;
+    // } else {
+    //   var offset1 = 750;
+    // }
     
-    if(ft1 < ft2) {
-      var offset2 = 950;
-    } else {
-      var offset2 = 970;
-    }
+    // if(ft1 < ft2) {
+    //   var offset2 = 950;
+    // } else {
+    //   var offset2 = 970;
+    // }
 
-    if(three1 < three2) {
-      var offset3 = 1165;
-    } else {
-      var offset3 = 1185;
-    }
+    // if(three1 < three2) {
+    //   var offset3 = 1165;
+    // } else {
+    //   var offset3 = 1185;
+    // }
 
-    drawCircleStat(fg1, fg2, offset1, fg1 > fg2, 0, index1, index2);
-    drawCircleStat(ft1, ft2, offset2, ft1 > ft2, 1, index1, index2);
-    drawCircleStat(three1, three2, offset3, three1 > three2, 2, index1, index2);
-    drawDivider(925, 430, 925, 615, "DarkGrey", 2, 0.3);
-    drawDivider(1145, 430, 1145, 615, "DarkGrey", 2, 0.3);
+    drawCircleStat(fg1, fg2, 0, 720, index1, index2);
+    drawCircleStat(ft1, ft2, 1, 940, index1, index2);
+    drawCircleStat(three1, three2, 2, 1157, index1, index2);
+    drawDivider(918, 430, 918, 615, "DarkGrey", 2, 0.3);
+    drawDivider(1142, 430, 1142, 615, "DarkGrey", 2, 0.3);
   }
 
   function drawLegend(player1, player2) {
