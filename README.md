@@ -1,13 +1,9 @@
 # NBA Player Comparator
 > Visualizes the stats of various NBA players to compare the best of the league
 
-[![NPM Version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Downloads Stats][npm-downloads]][npm-url]
-
 The NBA Player Comparator visualizes the stats of basketball players players from the National Basketball Association (NBA) from the past up until the 2016-2017 NBA season. The comparator visualizes two players at a time, comparing their overall career stats, followed by their season-by-season stats. This was built with NBA fans in mind, as well as the general public who may not know too much about basketball but are interested in some of the top players of the NBA history. 
 
-![Final Build](final_build.png)
+![](final_build.PNG)
 
 
 ## Usage example
