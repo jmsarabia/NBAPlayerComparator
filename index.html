@@ -1168,6 +1168,7 @@ d3.csv("seasonstats.csv", function(data) {
     function getStatDefinition(stat) {
         var definition;
         var textSize = 2.75;
+<<<<<<< HEAD
 
         if(stat.includes("PPG"))
         {
@@ -1205,6 +1206,45 @@ d3.csv("seasonstats.csv", function(data) {
           div.style("height", "98px");
         }
 
+=======
+
+        if(stat.includes("PPG"))
+        {
+          definition = "PPG stands for 'Points Per Game', which is the amount of points a player scores per game."
+              +"  Points are scored through field-goals (any 2-point shot), free throws (foul shots), or three-point shots.";
+          div.style("height", "105px");
+        }
+
+        if(stat.includes("APG"))
+        {
+          definition = "APG stands for 'Assists Per Game', which is the amount of assists a player gets per game. "
+            +"An assist is noted for a player if they pass it to a teammate in a way that leads to the teammate scoring.";
+          div.style("height", "105px");
+        }
+
+        if(stat.includes("RPG"))
+        {
+          definition = "RPG stands for 'Rebounds Per Game', which is the number of rebounds obtained per game. "
+            +"A rebound, sometimes referred to as a \"board\", is recorded for a player if he retrieves the ball after "
+            +"a missed shot.";
+          div.style("height", "105px");
+        }
+
+        if(stat.includes("BPG"))
+        {
+          definition = "BPG stands for 'Blocks Per Game', which is the number of blocks committed per game. "
+            +"A block is given to a player that deflects a shot; but if a foul is called from player contact, no block is recorded.";
+          div.style("height", "105px");
+        }
+
+        if(stat.includes("SPG"))
+        {
+          definition = " SPG stands for 'Steals Per Game', which is the number of steals obtained per game. A steal is awarded to a defensive player who forces a turnover, taking the "
+            +"ball from the team on offense."
+          div.style("height", "98px");
+        }
+
+>>>>>>> 0932a0a55f80dc9e1ae183c4e933b31a1555f82b
         if(stat.includes("+/-"))
         {
           definition = "+/- stands for the 'Plus-Minus Score' of a player, which is a metric that compares how a team performs when a player "
