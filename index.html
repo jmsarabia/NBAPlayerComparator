@@ -69,6 +69,7 @@ function alreadyExists(name) {
   return -1;
 }
 
+// Restrict player list to only the ones that have 20,000 points or more
 function getBestPlayers() {
   var bestplayers = [];
   for(r = 0 ; r < allplayers.length ; r++) {
@@ -97,19 +98,7 @@ function debugging1(bestplayers) {
   for(q = 0 ; q < bestplayers.length ; q++) {
     console.log(bestplayers[q].name);
     console.log(round(bestplayers[q].averages[5], 1));
-      // for(e = 0 ; e < bestplayers[q].seasons.length ; e++) {
-      //   console.log(bestplayers[])
-        // console.log(bestplayers[q].seasons[e].year);
-        // console.log(bestplayers[q].seasons[e].playoffs);
-        // if(bestplayers[q].seasons[e].team.length > 1) {
-        //   for(w = 0 ; w < bestplayers[q].seasons[e].team.length ; w++) {
-        //     console.log(bestplayers[q].seasons[e].team[w]);
-        //   }
-        // } else {
-        //   console.log(bestplayers[q].seasons[e].team[0]);
-        // }
-    // }
-  // console.log("LENGTH: " + bestplayers.length);
+      
   }
 }
 
